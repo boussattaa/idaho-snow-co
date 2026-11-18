@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Before clearing: Ice dam and drifted metal roof load near Tamarack Resort">
+  <rect width="800" height="500" fill="#0f172a"/>
+  <!-- Chalet Body -->
+  <rect x="130" y="250" width="540" height="170" fill="#1e293b" stroke="#334155" stroke-width="3"/>
+  <polygon points="100,255 400,130 700,255" fill="#475569"/>
+  <!-- Deep Asymmetrical Drift -->
+  <path d="M95,245 Q230,175 400,98 Q590,115 710,248 L695,260 L400,135 L105,260 Z" fill="#f8fafc"/>
+  <!-- Thick Gutter Ice -->
+  <rect x="96" y="250" width="608" height="16" rx="4" fill="#7dd3fc"/>
+  <polygon points="120,266 130,305 140,266" fill="#bae6fd"/>
+  <polygon points="650,266 660,315 670,266" fill="#bae6fd"/>
+  <rect y="420" width="800" height="80" fill="#cbd5e1"/>
+  <rect x="28" y="24" width="300" height="42" rx="21" fill="#f59e0b"/>
+  <text x="178" y="51" font-family="system-ui, sans-serif" font-size="16" font-weight="800" fill="#0f172a" text-anchor="middle">BEFORE • DRIFTED LOAD &amp; EAVE ICE DAM</text>
+</svg>

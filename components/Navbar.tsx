@@ -2,14 +2,49 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, MountainSnow, Phone, ShieldAlert, X, Calculator } from "lucide-react";
-import { SITE_CONFIG } from "@/lib/services";
+import {
+  Calculator,
+  Menu,
+  MountainSnow,
+  Phone,
+  ShieldAlert,
+  X,
+} from "lucide-react";
+import { trackPhoneClick } from "@/lib/analytics";
+import { SERVICES, SITE_CONFIG } from "@/lib/services";
+import { STORM_BANNER_CONFIG } from "@/lib/site-config";
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-[#0F172A]/95 text-[#F8FAFC] backdrop-blur-md">
+      {/* Configurable Dismissible Storm Alert Banner */}
+      {STORM_BANNER_CONFIG.enabled && !bannerDismissed ? (
+        <div className="border-b border-amber-500/30 bg-gradient-to-r from-amber-500/20 via-slate-900 to-sky-500/20 px-4 py-2 text-xs">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2 font-medium text-amber-100">
+              <span>{STORM_BANNER_CONFIG.text}</span>
+              <Link
+                href={STORM_BANNER_CONFIG.ctaHref}
+                className="inline-flex items-center rounded-full bg-amber-500 px-2.5 py-0.5 text-[11px] font-extrabold text-slate-950 hover:bg-amber-400 transition-colors"
+              >
+                {STORM_BANNER_CONFIG.ctaLabel} &rarr;
+              </Link>
+            </div>
+            <button
+              type="button"
+              onClick={() => setBannerDismissed(true)}
+              aria-label="Dismiss storm alert banner"
+              className="rounded-lg p-1 text-slate-300 hover:bg-slate-800 hover:text-white"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       {/* Top Emergency Storm Dispatch Strip */}
       <div className="border-b border-slate-800 bg-slate-950/90 px-4 py-1.5 text-xs">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
@@ -24,6 +59,7 @@ export function Navbar() {
           </div>
           <a
             href={SITE_CONFIG.phoneHref}
+            onClick={() => trackPhoneClick("navbar_top_strip")}
             className="inline-flex items-center gap-1.5 font-semibold text-sky-400 hover:text-sky-300 transition-colors"
           >
             <Phone className="h-3.5 w-3.5" />
@@ -49,30 +85,39 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Links */}
-        <nav className="hidden items-center gap-6 lg:flex" aria-label="Main navigation">
-          <Link
-            href="/services/roof-snow-removal"
-            className="text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
-          >
-            Roof Snow Removal
-          </Link>
-          <Link
-            href="/services/ice-dam-removal"
-            className="text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
-          >
-            Ice Dam Removal
-          </Link>
-          <Link
-            href="/services/cabin-snow-monitoring"
-            className="text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
-          >
-            Cabin Monitoring
-          </Link>
+        <nav className="hidden items-center gap-5 xl:gap-6 lg:flex" aria-label="Main navigation">
+          {SERVICES.map((svc) => (
+            <Link
+              key={svc.slug}
+              href={svc.href}
+              className="text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
+            >
+              {svc.shortTitle}
+            </Link>
+          ))}
           <Link
             href="/locations"
             className="text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
           >
-            Service Areas (11 Towns)
+            Service Areas
+          </Link>
+          <Link
+            href="/snow-load-calculator"
+            className="text-sm font-medium text-sky-300 hover:text-sky-200 transition-colors"
+          >
+            PSF Weight Tool
+          </Link>
+          <Link
+            href="/guides"
+            className="text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
+          >
+            Guides
+          </Link>
+          <Link
+            href="/property-managers"
+            className="text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
+          >
+            STR &amp; HOAs
           </Link>
         </nav>
 
@@ -87,6 +132,7 @@ export function Navbar() {
           </Link>
           <a
             href={SITE_CONFIG.phoneHref}
+            onClick={() => trackPhoneClick("navbar_cta")}
             className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/20 hover:bg-amber-400 transition-colors"
           >
             <ShieldAlert className="h-4 w-4" />
@@ -118,6 +164,13 @@ export function Navbar() {
               Instant Quote Calculator
             </Link>
             <Link
+              href="/snow-load-calculator"
+              onClick={() => setMobileOpen(false)}
+              className="rounded-xl bg-amber-500/10 px-4 py-2.5 text-sm font-semibold text-amber-300"
+            >
+              Roof Snow-Load (PSF) Weight Calculator
+            </Link>
+            <Link
               href="/services/roof-snow-removal"
               onClick={() => setMobileOpen(false)}
               className="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-200 hover:bg-slate-900"
@@ -137,6 +190,20 @@ export function Navbar() {
               className="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-200 hover:bg-slate-900"
             >
               Out-of-Town Cabin Monitoring
+            </Link>
+            <Link
+              href="/property-managers"
+              onClick={() => setMobileOpen(false)}
+              className="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-200 hover:bg-slate-900"
+            >
+              Property Managers, HOAs &amp; STR Hosts
+            </Link>
+            <Link
+              href="/guides"
+              onClick={() => setMobileOpen(false)}
+              className="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-200 hover:bg-slate-900"
+            >
+              Winter Roof &amp; Ice Dam Guides
             </Link>
             <Link
               href="/locations"

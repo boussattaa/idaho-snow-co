@@ -75,10 +75,42 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="/snow-load-calculator"
+                  className="text-sky-400 hover:text-sky-300 transition-colors"
+                >
+                  Roof Snow-Load (PSF) Calculator
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/property-managers"
+                  className="text-slate-400 hover:text-sky-400 transition-colors"
+                >
+                  STR Hosts, HOAs &amp; Property Managers
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/guides"
+                  className="text-slate-400 hover:text-sky-400 transition-colors"
+                >
+                  Winter Roof &amp; Ice Dam Guides
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/locations"
                   className="text-slate-400 hover:text-sky-400 transition-colors"
                 >
                   Corridor Service Area Hub
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/terms"
+                  className="text-slate-400 hover:text-sky-400 transition-colors"
+                >
+                  Service Terms &amp; Liability Waiver
                 </Link>
               </li>
             </ul>
@@ -140,7 +172,10 @@ export function Footer() {
           </p>
           <p>
             Fully insured mountain roof snow removal • Non-marring polymer blades •{" "}
-            {SITE_CONFIG.domain}
+            <Link href="/terms" className="underline hover:text-slate-300">
+              Service Terms &amp; Waiver
+            </Link>{" "}
+            • {SITE_CONFIG.domain}
           </p>
         </div>
       </div>

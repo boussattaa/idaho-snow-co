@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { Calculator, Phone } from "lucide-react";
+import { trackPhoneClick } from "@/lib/analytics";
 import { SITE_CONFIG } from "@/lib/services";
 
 export function MobileStickyBar() {
@@ -19,6 +22,7 @@ export function MobileStickyBar() {
         </Link>
         <a
           href={SITE_CONFIG.phoneHref}
+          onClick={() => trackPhoneClick("mobile_sticky_bar")}
           className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-500 px-3 py-3 text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.99]"
         >
           <Phone className="h-4 w-4 shrink-0" />

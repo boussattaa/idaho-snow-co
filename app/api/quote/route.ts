@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import {
   calculateSnowQuote,
@@ -34,6 +34,13 @@ const quoteSubmissionSchema = z.object({
       ])
     )
     .default([]),
+  flexibleRouteDay: z.boolean().default(false),
+  waiverAccepted: z.literal(true, {
+    errorMap: () => ({
+      message:
+        "You must accept the roof-clearing liability waiver to schedule.",
+    }),
+  }),
   name: z.string().trim().min(2, "Please enter your full name.").max(120),
   phone: z
     .string()
@@ -51,9 +58,11 @@ const quoteSubmissionSchema = z.object({
     .trim()
     .min(2, "Please choose your preferred service timing.")
     .max(120),
+  urgency: z.string().trim().max(120).optional().nullable(),
+  sourceUrl: z.string().trim().max(300).optional().nullable(),
   photoName: z.string().max(180).optional().nullable(),
   photoDataUrl: z.string().max(3_500_000).optional().nullable(),
-  notes: z.string().max(1200).optional().nullable(),
+  notes: z.string().max(1600).optional().nullable(),
 });
 
 function generateReferenceId(): string {
@@ -62,27 +71,83 @@ function generateReferenceId(): string {
   return `ISC-${year}${randomDigits}`;
 }
 
-async function storeInSupabase(payload: {
-  referenceId: string;
-  parsed: z.infer<typeof quoteSubmissionSchema>;
-  locationName: string;
-  quoteLow: number;
-  quoteHigh: number;
-}): Promise<{ stored: boolean; error?: string }> {
+function getSupabaseServerClient(): SupabaseClient | null {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
+    return null;
+  }
+
+  return createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false },
+  });
+}
+
+async function uploadPhotoToStorage(
+  supabase: SupabaseClient | null,
+  referenceId: string,
+  photoName?: string | null,
+  photoDataUrl?: string | null
+): Promise<string | null> {
+  if (!supabase || !photoDataUrl) return null;
+
+  const match = photoDataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+  if (!match) return null;
+
+  const mimeType = match[1];
+  const base64Data = match[2];
+  const extension = mimeType.split("/")[1]?.replace(/[^a-zA-Z0-9]/g, "") || "jpg";
+  const safeBaseName = (photoName || `roof.${extension}`)
+    .replace(/[^a-zA-Z0-9._-]/g, "-")
+    .slice(-48);
+  const objectPath = `leads/${referenceId}-${Date.now()}-${safeBaseName}`;
+
+  try {
+    const buffer = Buffer.from(base64Data, "base64");
+    const { error } = await supabase.storage
+      .from("snow-lead-photos")
+      .upload(objectPath, buffer, {
+        contentType: mimeType,
+        upsert: false,
+      });
+
+    if (error) {
+      console.warn("[IdahoSnowCo] Storage photo upload warning:", error.message);
+      return null;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from("snow-lead-photos")
+      .getPublicUrl(objectPath);
+
+    return publicUrlData.publicUrl || null;
+  } catch (err) {
+    console.warn("[IdahoSnowCo] Storage upload exception:", err);
+    return null;
+  }
+}
+
+async function storeInSupabase(
+  supabase: SupabaseClient | null,
+  payload: {
+    referenceId: string;
+    parsed: z.infer<typeof quoteSubmissionSchema>;
+    locationName: string;
+    quoteLow: number;
+    quoteHigh: number;
+    photoUrl: string | null;
+    flexibleRouteDay: boolean;
+    waiverAcceptedAt: string;
+  }
+): Promise<{ stored: boolean; error?: string }> {
+  if (!supabase) {
     return { stored: false };
   }
 
-  const supabase = createClient(supabaseUrl, supabaseKey, {
-    auth: { persistSession: false },
-  });
-
-  const { error } = await supabase.from("snow_leads").insert({
+  const baseInsert = {
     reference_id: payload.referenceId,
     name: payload.parsed.name,
     phone: payload.parsed.phone,
@@ -99,11 +164,30 @@ async function storeInSupabase(payload: {
     estimated_low: payload.quoteLow,
     estimated_high: payload.quoteHigh,
     photo_name: payload.parsed.photoName || null,
-    photo_data_url: payload.parsed.photoDataUrl || null,
+    photo_data_url: payload.photoUrl ? null : payload.parsed.photoDataUrl || null,
     notes: payload.parsed.notes || null,
     status: "new",
-    source: "website-quote-calculator",
+    source: payload.parsed.sourceUrl || "website-quote-calculator",
+  };
+
+  let { error } = await supabase.from("snow_leads").insert({
+    ...baseInsert,
+    photo_url: payload.photoUrl,
+    flexible_route_day: payload.flexibleRouteDay,
+    waiver_accepted: true,
+    waiver_accepted_at: payload.waiverAcceptedAt,
   });
+
+  // Fallback if 002 or 003 migrations haven't been run yet
+  if (
+    error &&
+    (error.message.includes("photo_url") ||
+      error.message.includes("flexible_route_day") ||
+      error.message.includes("waiver_accepted"))
+  ) {
+    const retry = await supabase.from("snow_leads").insert(baseInsert);
+    error = retry.error;
+  }
 
   if (error) {
     return { stored: false, error: error.message };
@@ -118,6 +202,9 @@ async function sendResendEmail(payload: {
   locationName: string;
   quoteLow: number;
   quoteHigh: number;
+  photoUrl: string | null;
+  flexibleRouteDay: boolean;
+  waiverAcceptedAt: string;
 }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return;
@@ -144,10 +231,18 @@ async function sendResendEmail(payload: {
           <tr><td style="padding: 6px 0; color: #475569;">Email</td><td style="padding: 6px 0;">${payload.parsed.email}</td></tr>
           <tr><td style="padding: 6px 0; color: #475569;">Area</td><td style="padding: 6px 0;"><strong>${payload.locationName}</strong></td></tr>
           <tr><td style="padding: 6px 0; color: #475569;">Address</td><td style="padding: 6px 0;">${payload.parsed.propertyAddress}</td></tr>
-          <tr><td style="padding: 6px 0; color: #475569;">Timing</td><td style="padding: 6px 0;">${payload.parsed.preferredTiming}</td></tr>
+          <tr><td style="padding: 6px 0; color: #475569;">Timing / Urgency</td><td style="padding: 6px 0;">${payload.parsed.urgency || payload.parsed.preferredTiming}</td></tr>
+          <tr><td style="padding: 6px 0; color: #475569;">Route-Day Discount</td><td style="padding: 6px 0;">${
+            payload.flexibleRouteDay ? "Yes (-10% Fri–Sun Corridor Run)" : "No"
+          }</td></tr>
+          <tr><td style="padding: 6px 0; color: #475569;">Waiver Accepted</td><td style="padding: 6px 0;">Yes (${payload.waiverAcceptedAt})</td></tr>
           <tr><td style="padding: 6px 0; color: #475569;">Roof Specs</td><td style="padding: 6px 0;">${payload.parsed.roofSize} | ${payload.parsed.roofMaterial} | ${payload.parsed.roofPitch} | ${payload.parsed.snowDepth}</td></tr>
           <tr><td style="padding: 6px 0; color: #475569;">Add-ons</td><td style="padding: 6px 0;">${addonsList}</td></tr>
-          <tr><td style="padding: 6px 0; color: #475569;">Photo Attached</td><td style="padding: 6px 0;">${payload.parsed.photoName ? payload.parsed.photoName : "None"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #475569;">Photo</td><td style="padding: 6px 0;">${
+            payload.photoUrl
+              ? `<a href="${payload.photoUrl}">View Uploaded Photo</a>`
+              : payload.parsed.photoName || "None"
+          }</td></tr>
         </table>
         ${
           payload.parsed.notes
@@ -180,6 +275,9 @@ async function sendTwilioSms(payload: {
   locationName: string;
   quoteLow: number;
   quoteHigh: number;
+  photoUrl: string | null;
+  flexibleRouteDay: boolean;
+  waiverAcceptedAt: string;
 }): Promise<void> {
   const sid = process.env.TWILIO_ACCOUNT_SID;
   const token = process.env.TWILIO_AUTH_TOKEN;
@@ -190,11 +288,15 @@ async function sendTwilioSms(payload: {
 
   const estimateString = `${formatCurrency(payload.quoteLow)}-${formatCurrency(payload.quoteHigh)}`;
   const body = [
-    `IDAHO SNOW CO LEAD (${payload.referenceId})`,
+    `[IDAHO SNOW CO LEAD] (${payload.referenceId})`,
     `${payload.parsed.name} | ${payload.parsed.phone}`,
     `${payload.locationName}: ${payload.parsed.propertyAddress}`,
-    `Est: ${estimateString} | ${payload.parsed.snowDepth} | ${payload.parsed.preferredTiming}`,
-  ].join("\n");
+    `Est: ${estimateString}${payload.flexibleRouteDay ? " (-10% Route-Day)" : ""} | ${payload.parsed.snowDepth} | ${payload.parsed.urgency || payload.parsed.preferredTiming}`,
+    `Waiver Accepted: Yes (${payload.waiverAcceptedAt})`,
+    payload.photoUrl ? `Photo: ${payload.photoUrl}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   const auth = Buffer.from(`${sid}:${token}`).toString("base64");
   const form = new URLSearchParams({
@@ -217,44 +319,50 @@ async function forwardToCrmWebhook(payload: {
   referenceId: string;
   parsed: z.infer<typeof quoteSubmissionSchema>;
   locationName: string;
+  travelZoneName: string;
   quoteLow: number;
   quoteHigh: number;
+  photoUrl: string | null;
+  sourceUrl: string;
+  flexibleRouteDay: boolean;
+  waiverAcceptedAt: string;
 }): Promise<void> {
-  const webhookUrl = process.env.CRM_WEBHOOK_URL;
+  const webhookUrl =
+    process.env.CRM_WEBHOOK_URL ||
+    "https://crm.premiercleaningpro.com/api/webhooks/idaho-snow-co";
   if (!webhookUrl) return;
+
+  const webhookSecret = process.env.CRM_WEBHOOK_SECRET || "";
+  const urgencyValue = payload.parsed.urgency || payload.parsed.preferredTiming;
 
   await fetch(webhookUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...(webhookSecret ? { "x-webhook-secret": webhookSecret } : {}),
     },
     body: JSON.stringify({
-      source: "idahosnowco.com",
-      brand: SITE_CONFIG.businessName,
-      referenceId: payload.referenceId,
-      createdAt: new Date().toISOString(),
-      contact: {
-        name: payload.parsed.name,
-        phone: payload.parsed.phone,
-        email: payload.parsed.email,
-      },
-      property: {
-        address: payload.parsed.propertyAddress,
-        locationSlug: payload.parsed.locationSlug,
-        locationName: payload.locationName,
-        preferredTiming: payload.parsed.preferredTiming,
-      },
-      quote: {
-        roofSize: payload.parsed.roofSize,
-        roofMaterial: payload.parsed.roofMaterial,
-        roofPitch: payload.parsed.roofPitch,
-        snowDepth: payload.parsed.snowDepth,
-        addons: payload.parsed.addons,
-        estimatedLow: payload.quoteLow,
-        estimatedHigh: payload.quoteHigh,
-        photoName: payload.parsed.photoName || null,
-        notes: payload.parsed.notes || null,
-      },
+      reference_id: payload.referenceId,
+      name: payload.parsed.name,
+      phone: payload.parsed.phone,
+      email: payload.parsed.email,
+      address: payload.parsed.propertyAddress,
+      city: payload.locationName,
+      travel_zone: payload.travelZoneName,
+      roof_size: payload.parsed.roofSize,
+      roof_material: payload.parsed.roofMaterial,
+      roof_pitch: payload.parsed.roofPitch,
+      snow_depth: payload.parsed.snowDepth,
+      addons: payload.parsed.addons,
+      estimated_low: payload.quoteLow,
+      estimated_high: payload.quoteHigh,
+      urgency: urgencyValue,
+      flexible_route_day: payload.flexibleRouteDay,
+      waiver_accepted: true,
+      waiver_accepted_at: payload.waiverAcceptedAt,
+      photo_url: payload.photoUrl,
+      source_url: payload.sourceUrl,
+      notes: payload.parsed.notes || null,
     }),
   });
 }
@@ -287,21 +395,40 @@ export async function POST(request: NextRequest) {
       roofPitch: parsed.roofPitch as RoofPitchId,
       snowDepth: parsed.snowDepth as SnowDepthId,
       addons: parsed.addons as QuoteAddonId[],
+      flexibleRouteDay: parsed.flexibleRouteDay,
     });
 
-    const referenceId = generateReferenceId();
+    const flexibleRouteDay = calculated.flexibleRouteDayApplied;
+    const waiverAcceptedAt = new Date().toISOString();
 
-    const dbResult = await storeInSupabase({
+    const referenceId = generateReferenceId();
+    const supabase = getSupabaseServerClient();
+    const photoUrl = await uploadPhotoToStorage(
+      supabase,
+      referenceId,
+      parsed.photoName,
+      parsed.photoDataUrl
+    );
+
+    const dbResult = await storeInSupabase(supabase, {
       referenceId,
       parsed,
       locationName,
       quoteLow: calculated.low,
       quoteHigh: calculated.high,
+      photoUrl,
+      flexibleRouteDay,
+      waiverAcceptedAt,
     });
 
     if (dbResult.error) {
       console.error("[IdahoSnowCo] Supabase insert notice:", dbResult.error);
     }
+
+    const sourceUrl =
+      parsed.sourceUrl ||
+      request.headers.get("referer") ||
+      `${SITE_CONFIG.domain}/quote`;
 
     await Promise.allSettled([
       sendResendEmail({
@@ -310,6 +437,9 @@ export async function POST(request: NextRequest) {
         locationName,
         quoteLow: calculated.low,
         quoteHigh: calculated.high,
+        photoUrl,
+        flexibleRouteDay,
+        waiverAcceptedAt,
       }),
       sendTwilioSms({
         referenceId,
@@ -317,19 +447,30 @@ export async function POST(request: NextRequest) {
         locationName,
         quoteLow: calculated.low,
         quoteHigh: calculated.high,
+        photoUrl,
+        flexibleRouteDay,
+        waiverAcceptedAt,
       }),
       forwardToCrmWebhook({
         referenceId,
         parsed,
         locationName,
+        travelZoneName: calculated.travelZone.name,
         quoteLow: calculated.low,
         quoteHigh: calculated.high,
+        photoUrl,
+        sourceUrl,
+        flexibleRouteDay,
+        waiverAcceptedAt,
       }),
     ]);
 
     return NextResponse.json({
       success: true,
       referenceId,
+      photoUrl,
+      flexibleRouteDay,
+      waiverAcceptedAt,
       estimate: {
         low: calculated.low,
         high: calculated.high,

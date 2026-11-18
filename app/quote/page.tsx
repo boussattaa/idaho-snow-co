@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { AlertTriangle, Clock, Phone, ShieldCheck, Weight } from "lucide-react";
 import { QuoteCalculator } from "@/components/QuoteCalculator";
+import { QuotePageCalculator } from "@/components/QuotePageCalculator";
 import { SITE_CONFIG } from "@/lib/services";
 
 export const metadata: Metadata = {
@@ -42,7 +44,16 @@ export default function QuotePage() {
       </section>
 
       <div className="mx-auto max-w-7xl px-4 pt-10 sm:px-6 lg:px-8">
-        <QuoteCalculator defaultLocationSlug="mccall" id="dedicated-quote-calculator" />
+        <Suspense
+          fallback={
+            <QuoteCalculator
+              defaultLocationSlug="mccall"
+              id="dedicated-quote-calculator"
+            />
+          }
+        >
+          <QuotePageCalculator />
+        </Suspense>
 
         {/* Snow Load Weight Reference & Safety Guarantee */}
         <div className="mt-12 grid gap-6 lg:grid-cols-2">

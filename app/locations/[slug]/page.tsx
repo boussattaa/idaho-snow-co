@@ -224,6 +224,14 @@ export default async function LocationDetailPage({ params }: LocationPageProps) 
                     </dd>
                   </div>
                 </dl>
+
+                <Link
+                  href="/snow-load-calculator"
+                  className="mt-5 flex items-center justify-center gap-2 rounded-xl border border-sky-400/30 bg-sky-500/10 px-4 py-2.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition-colors"
+                >
+                  <span>Check {location.name} Roof Snow Weight (PSF)</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
               </div>
             </div>
           </div>

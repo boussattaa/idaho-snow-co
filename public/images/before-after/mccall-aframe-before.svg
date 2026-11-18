@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Before clearing: 4-foot snow load and eave ice buildup in McCall">
+  <defs>
+    <linearGradient id="skyBefore" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#skyBefore)"/>
+  <circle cx="110" cy="95" r="3" fill="#94a3b8" opacity="0.6"/>
+  <circle cx="240" cy="60" r="2.5" fill="#cbd5e1" opacity="0.7"/>
+  <circle cx="620" cy="80" r="3" fill="#94a3b8" opacity="0.6"/>
+  <circle cx="710" cy="130" r="2" fill="#e2e8f0" opacity="0.5"/>
+  <!-- Cabin Base -->
+  <polygon points="160,420 400,155 640,420" fill="#334155" stroke="#475569" stroke-width="4"/>
+  <rect x="260" y="290" width="280" height="130" fill="#1e293b"/>
+  <rect x="355" y="325" width="90" height="95" rx="6" fill="#0f172a" stroke="#f59e0b" stroke-width="3"/>
+  <!-- Heavy Snow Cap Over Roof -->
+  <path d="M128,412 Q250,240 400,115 Q550,240 672,412 L640,424 L400,165 L160,424 Z" fill="#f8fafc"/>
+  <path d="M135,418 Q185,445 205,415 Q260,340 400,145 Q540,340 595,415 Q620,445 665,418" fill="none" stroke="#38bdf8" stroke-width="6" stroke-dasharray="10 8"/>
+  <!-- Icicles -->
+  <polygon points="150,418 160,455 170,418" fill="#bae6fd"/>
+  <polygon points="180,418 188,448 196,418" fill="#bae6fd"/>
+  <polygon points="604,418 612,450 620,418" fill="#bae6fd"/>
+  <polygon points="632,418 642,462 652,418" fill="#bae6fd"/>
+  <!-- Ground Snow -->
+  <rect y="420" width="800" height="80" fill="#e2e8f0"/>
+  <!-- Label Pill -->
+  <rect x="28" y="24" width="275" height="42" rx="21" fill="#f59e0b"/>
+  <text x="165" y="51" font-family="system-ui, sans-serif" font-size="16" font-weight="800" fill="#0f172a" text-anchor="middle">BEFORE • 46" HEAVY SNOW LOAD</text>
+</svg>

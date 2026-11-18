@@ -260,6 +260,12 @@ export const QUOTE_ADDONS: QuoteAddonOption[] = [
  * Quote range spread (+/- variance around calculated midpoint) so quotes account
  * for hidden eave ice, buried valleys, or wind-drifted cornices without surprise bills.
  */
+/**
+ * Flexible Route-Day Discount applied when customers join scheduled Friday–Sunday
+ * Highway 55 corridor runs instead of booking Priority 24-Hr Emergency Dispatch.
+ */
+export const ROUTE_DAY_DISCOUNT_RATE = 0.10;
+
 export const PRICING_SPREAD_RATIO = {
   lowFactor: 0.92,
   highFactor: 1.12,
@@ -287,6 +293,7 @@ export interface QuoteCalculationInput {
   roofPitch: RoofPitchId;
   snowDepth: SnowDepthId;
   addons: QuoteAddonId[];
+  flexibleRouteDay?: boolean;
 }
 
 export interface CalculatedAddonBreakdown {
@@ -299,6 +306,12 @@ export interface CalculatedAddonBreakdown {
 export interface QuoteCalculationResult {
   low: number;
   high: number;
+  undiscountedLow: number;
+  undiscountedHigh: number;
+  flexibleRouteDayApplied: boolean;
+  routeDayDiscountLow: number;
+  routeDayDiscountHigh: number;
+  routeDayDiscountLabel: string;
   baseAmount: number;
   materialAdjustment: number;
   pitchAdjustment: number;
@@ -359,11 +372,42 @@ export function calculateSnowQuote(input: QuoteCalculationInput): QuoteCalculati
   const rawLow = coreSubtotal * PRICING_SPREAD_RATIO.lowFactor + addonsTotalLow;
   const rawHigh = coreSubtotal * PRICING_SPREAD_RATIO.highFactor + addonsTotalHigh;
 
-  const low = roundToIncrement(rawLow, PRICING_SPREAD_RATIO.roundingIncrement);
-  const high = Math.max(
-    low + 75,
+  const undiscountedLow = roundToIncrement(
+    rawLow,
+    PRICING_SPREAD_RATIO.roundingIncrement
+  );
+  const undiscountedHigh = Math.max(
+    undiscountedLow + 75,
     roundToIncrement(rawHigh, PRICING_SPREAD_RATIO.roundingIncrement)
   );
+
+  // Mutual exclusivity enforced server-side: Priority 24-Hr Emergency Dispatch cannot combine with Route-Day Discount
+  const hasPriorityDispatch = uniqueAddonIds.includes("priority-24hr-dispatch");
+  const flexibleRouteDayApplied =
+    Boolean(input.flexibleRouteDay) && !hasPriorityDispatch;
+
+  const routeDayDiscountLow = flexibleRouteDayApplied
+    ? Math.round(undiscountedLow * ROUTE_DAY_DISCOUNT_RATE)
+    : 0;
+  const routeDayDiscountHigh = flexibleRouteDayApplied
+    ? Math.round(undiscountedHigh * ROUTE_DAY_DISCOUNT_RATE)
+    : 0;
+
+  const low = flexibleRouteDayApplied
+    ? roundToIncrement(
+        undiscountedLow * (1 - ROUTE_DAY_DISCOUNT_RATE),
+        PRICING_SPREAD_RATIO.roundingIncrement
+      )
+    : undiscountedLow;
+  const high = flexibleRouteDayApplied
+    ? Math.max(
+        low + 50,
+        roundToIncrement(
+          undiscountedHigh * (1 - ROUTE_DAY_DISCOUNT_RATE),
+          PRICING_SPREAD_RATIO.roundingIncrement
+        )
+      )
+    : undiscountedHigh;
 
   const estimatedHours = Number(
     (
@@ -376,6 +420,12 @@ export function calculateSnowQuote(input: QuoteCalculationInput): QuoteCalculati
   return {
     low,
     high,
+    undiscountedLow,
+    undiscountedHigh,
+    flexibleRouteDayApplied,
+    routeDayDiscountLow,
+    routeDayDiscountHigh,
+    routeDayDiscountLabel: "-10% Route-Day Discount",
     baseAmount,
     materialAdjustment,
     pitchAdjustment,

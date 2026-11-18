@@ -1,12 +1,16 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
+  BookOpen,
+  Building2,
   Camera,
   CheckCircle2,
   CreditCard,
   MapPin,
   MountainSnow,
   Phone,
+  Scale,
   ShieldAlert,
   ShieldCheck,
   Snowflake,
@@ -147,15 +151,19 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-xs">
-                  <span className="text-slate-300">
-                    Need urgent roof relief or leak help?
-                  </span>
+                <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-xs">
+                  <Link
+                    href="/snow-load-calculator"
+                    className="inline-flex items-center gap-1.5 font-semibold text-amber-300 hover:text-amber-200"
+                  >
+                    <Scale className="h-3.5 w-3.5" />
+                    <span>Calculate Roof PSF Load</span>
+                  </Link>
                   <Link
                     href="/quote"
                     className="font-bold text-sky-400 hover:text-sky-300"
                   >
-                    Price It Now &rarr;
+                    Price Clearing &rarr;
                   </Link>
                 </div>
               </div>
@@ -410,6 +418,173 @@ export default function HomePage() {
               online Stripe invoice.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* BEFORE & AFTER VISUAL SHOWCASE + ROOF-SAFE EQUIPMENT GUARANTEE */}
+      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+        <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-10">
+          <div className="flex flex-col justify-between gap-4 border-b border-slate-100 pb-6 sm:flex-row sm:items-end">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-sky-600">
+                Proof of Precision
+              </span>
+              <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+                Before &amp; After Roof Clearing Showcase
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm text-slate-600">
+                Every visit concludes with timestamped before-and-after roof,
+                eave, and deck photo proof—protecting luxury cabins, standing
+                seam panels, and architectural shingles across the corridor.
+              </p>
+            </div>
+            <Link
+              href="/snow-load-calculator"
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-xs font-extrabold text-sky-800 hover:bg-sky-100 transition-colors"
+            >
+              <Scale className="h-4 w-4" />
+              <span>Check Your Roof PSF Weight &rarr;</span>
+            </Link>
+          </div>
+
+          <div className="mt-8 grid gap-8 lg:grid-cols-2">
+            {/* Case 1: McCall A-Frame */}
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+              <div className="mb-3 flex items-center justify-between text-xs font-bold text-slate-700">
+                <span>McCall / Payette Lake (83638) • Shingle A-Frame</span>
+                <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-emerald-800">
+                  1.5&Prime; Cushion Preserved
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Image
+                  src="/images/before-after/mccall-aframe-before.svg"
+                  alt="Before clearing: 46-inch heavy snow load and icicles on McCall A-frame"
+                  width={800}
+                  height={500}
+                  className="aspect-[16/10] w-full rounded-xl border border-slate-200 object-cover"
+                />
+                <Image
+                  src="/images/before-after/mccall-aframe-after.svg"
+                  alt="After clearing: Balanced roof snow removal and open eave channels in McCall"
+                  width={800}
+                  height={500}
+                  className="aspect-[16/10] w-full rounded-xl border border-slate-200 object-cover"
+                />
+              </div>
+            </div>
+
+            {/* Case 2: Tamarack / Donnelly Standing Seam */}
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+              <div className="mb-3 flex items-center justify-between text-xs font-bold text-slate-700">
+                <span>Donnelly / Tamarack (83615) • Standing Seam Metal</span>
+                <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-sky-800">
+                  Zero Metal Blades Used
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Image
+                  src="/images/before-after/tamarack-metal-before.svg"
+                  alt="Before clearing: Drifted asymmetric snow load and eave ice dam in Donnelly"
+                  width={800}
+                  height={500}
+                  className="aspect-[16/10] w-full rounded-xl border border-slate-200 object-cover"
+                />
+                <Image
+                  src="/images/before-after/tamarack-metal-after.svg"
+                  alt="After clearing: Polymer-blade cleared standing seam roof and dry eaves"
+                  width={800}
+                  height={500}
+                  className="aspect-[16/10] w-full rounded-xl border border-slate-200 object-cover"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Roof-Safe Equipment Guarantee Strip */}
+          <div className="mt-8 grid gap-4 rounded-2xl border border-sky-200 bg-sky-50/70 p-5 sm:grid-cols-3">
+            <div className="flex items-start gap-3">
+              <Wrench className="mt-0.5 h-5 w-5 shrink-0 text-sky-700" />
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-900">
+                  Poly-Blade Shovels Only
+                </h3>
+                <p className="mt-0.5 text-xs text-slate-600">
+                  100% HDPE polymer edges—never steel blades touching Kynar
+                  metal or shingle surfaces.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <Snowflake className="mt-0.5 h-5 w-5 shrink-0 text-sky-700" />
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-900">
+                  Non-Marring Roof Rakes
+                </h3>
+                <p className="mt-0.5 text-xs text-slate-600">
+                  Cushioned rollers &amp; cushioned blades leave a safe buffer
+                  to protect roof warranties.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-sky-700" />
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-900">
+                  Full Winter Liability Protection
+                </h3>
+                <p className="mt-0.5 text-xs text-slate-600">
+                  OSHA fall-arrest rigging &amp; commercial winter roof coverage
+                  for multi-story lodges.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ORGANIC RESOURCES & B2B PARTNER BAR */}
+      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+        <div className="grid gap-6 md:grid-cols-2">
+          <Link
+            href="/guides"
+            className="group flex items-center justify-between gap-4 rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition-all hover:border-sky-400 hover:shadow-md"
+          >
+            <div>
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-600">
+                <BookOpen className="h-4 w-4" />
+                <span>Homeowner Knowledge Base</span>
+              </span>
+              <h3 className="mt-2 text-xl font-extrabold text-slate-900 group-hover:text-sky-700">
+                Idaho Cabin Roof &amp; Ice Dam Guides
+              </h3>
+              <p className="mt-1.5 text-sm text-slate-600">
+                PSF limits, standing seam vs. shingle safety, and McCall ice
+                prevention checklists.
+              </p>
+            </div>
+            <ArrowRight className="h-5 w-5 shrink-0 text-sky-600 transition-transform group-hover:translate-x-1" />
+          </Link>
+
+          <Link
+            href="/property-managers"
+            className="group flex items-center justify-between gap-4 rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition-all hover:border-amber-400 hover:shadow-md"
+          >
+            <div>
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-600">
+                <Building2 className="h-4 w-4" />
+                <span>B2B &amp; Vacation Rentals</span>
+              </span>
+              <h3 className="mt-2 text-xl font-extrabold text-slate-900 group-hover:text-amber-700">
+                For Property Managers, HOAs &amp; STR Hosts
+              </h3>
+              <p className="mt-1.5 text-sm text-slate-600">
+                Multi-cabin volume pricing, Friday check-in priority dispatch,
+                and consolidated Stripe billing.
+              </p>
+            </div>
+            <ArrowRight className="h-5 w-5 shrink-0 text-amber-600 transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
       </section>
 

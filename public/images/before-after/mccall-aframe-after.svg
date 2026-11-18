@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="After clearing: Balanced load removed and eave ice channels cleared in McCall">
+  <defs>
+    <linearGradient id="skyAfter" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#skyAfter)"/>
+  <!-- Clean Cabin A-Frame -->
+  <polygon points="160,420 400,155 640,420" fill="#334155" stroke="#38bdf8" stroke-width="5"/>
+  <rect x="260" y="290" width="280" height="130" fill="#1e293b"/>
+  <rect x="355" y="325" width="90" height="95" rx="6" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+  <!-- Protective 1.5in Cushion Line -->
+  <path d="M160,418 L400,152 L640,418" fill="none" stroke="#f8fafc" stroke-width="9" stroke-linecap="round"/>
+  <!-- Cleared Perimeter Egress -->
+  <rect y="420" width="800" height="80" fill="#f1f5f9"/>
+  <rect x="335" y="420" width="130" height="80" fill="#334155"/>
+  <!-- Label Pill -->
+  <rect x="28" y="24" width="315" height="42" rx="21" fill="#10b981"/>
+  <text x="185" y="51" font-family="system-ui, sans-serif" font-size="16" font-weight="800" fill="#0f172a" text-anchor="middle">AFTER • BALANCED &amp; EAVE CHANNELS CLEAR</text>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="After clearing: Standing seam metal roof cleared with polymer tools">
+  <rect width="800" height="500" fill="#0f172a"/>
+  <rect x="130" y="250" width="540" height="170" fill="#1e293b" stroke="#38bdf8" stroke-width="3"/>
+  <polygon points="100,255 400,130 700,255" fill="#334155" stroke="#38bdf8" stroke-width="4"/>
+  <!-- Standing Seam Lines -->
+  <line x1="200" y1="214" x2="220" y2="254" stroke="#64748b" stroke-width="3"/>
+  <line x1="280" y1="180" x2="295" y2="254" stroke="#64748b" stroke-width="3"/>
+  <line x1="400" y1="130" x2="400" y2="254" stroke="#64748b" stroke-width="3"/>
+  <line x1="520" y1="180" x2="505" y2="254" stroke="#64748b" stroke-width="3"/>
+  <line x1="600" y1="214" x2="580" y2="254" stroke="#64748b" stroke-width="3"/>
+  <!-- Clear Walk & Deck -->
+  <rect y="420" width="800" height="80" fill="#e2e8f0"/>
+  <rect x="290" y="420" width="220" height="80" fill="#334155"/>
+  <rect x="28" y="24" width="335" height="42" rx="21" fill="#10b981"/>
+  <text x="195" y="51" font-family="system-ui, sans-serif" font-size="16" font-weight="800" fill="#0f172a" text-anchor="middle">AFTER • POLY-BLADE CLEAR &amp; DRY EAVES</text>
+</svg>

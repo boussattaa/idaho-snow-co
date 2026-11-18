@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
+  CalendarCheck,
   Camera,
   Check,
   CheckCircle2,
@@ -19,6 +21,11 @@ import {
   UploadCloud,
   X,
 } from "lucide-react";
+import {
+  trackPhoneClick,
+  trackQuoteCalculated,
+  trackQuoteSubmitted,
+} from "@/lib/analytics";
 import {
   calculateSnowQuote,
   formatCurrency,
@@ -39,6 +46,7 @@ import { SITE_CONFIG } from "@/lib/services";
 interface QuoteCalculatorProps {
   defaultLocationSlug?: string;
   lockedLocationName?: string;
+  initialSnowDepth?: SnowDepthId;
   id?: string;
 }
 
@@ -61,6 +69,7 @@ const TIMING_OPTIONS = [
 export function QuoteCalculator({
   defaultLocationSlug = "mccall",
   lockedLocationName,
+  initialSnowDepth,
   id = "quote-calculator",
 }: QuoteCalculatorProps) {
   const corridorGroups = useMemo(() => getLocationsByCorridorZone(), []);
@@ -70,8 +79,12 @@ export function QuoteCalculator({
   const [roofMaterial, setRoofMaterial] =
     useState<RoofMaterialId>("standing-seam-metal");
   const [roofPitch, setRoofPitch] = useState<RoofPitchId>("moderate");
-  const [snowDepth, setSnowDepth] = useState<SnowDepthId>("2-4-ft");
+  const [snowDepth, setSnowDepth] = useState<SnowDepthId>(
+    initialSnowDepth ?? "2-4-ft"
+  );
   const [addons, setAddons] = useState<QuoteAddonId[]>([]);
+  const [flexibleRouteDay, setFlexibleRouteDay] = useState<boolean>(false);
+  const [exclusivityNote, setExclusivityNote] = useState<string | null>(null);
 
   // Lead Capture Form Fields
   const [name, setName] = useState("");
@@ -83,6 +96,8 @@ export function QuoteCalculator({
   const [photoName, setPhotoName] = useState<string | null>(null);
   const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
+  const [waiverAccepted, setWaiverAccepted] = useState<boolean>(false);
+  const [waiverError, setWaiverError] = useState<string | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -97,8 +112,17 @@ export function QuoteCalculator({
         roofPitch,
         snowDepth,
         addons,
+        flexibleRouteDay,
       }),
-    [locationSlug, roofSize, roofMaterial, roofPitch, snowDepth, addons]
+    [
+      locationSlug,
+      roofSize,
+      roofMaterial,
+      roofPitch,
+      snowDepth,
+      addons,
+      flexibleRouteDay,
+    ]
   );
 
   const selectedLocation = useMemo(
@@ -106,12 +130,67 @@ export function QuoteCalculator({
     [locationSlug]
   );
 
+  const hasMountedRef = useRef(false);
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+    trackQuoteCalculated({
+      locationSlug,
+      roofSize,
+      roofMaterial,
+      roofPitch,
+      snowDepth,
+      estimatedLow: quote.low,
+      estimatedHigh: quote.high,
+    });
+  }, [
+    locationSlug,
+    roofSize,
+    roofMaterial,
+    roofPitch,
+    snowDepth,
+    quote.low,
+    quote.high,
+  ]);
+
   function toggleAddon(addonId: QuoteAddonId) {
+    const isCurrentlyChecked = addons.includes(addonId);
+
+    if (addonId === "priority-24hr-dispatch" && !isCurrentlyChecked) {
+      if (flexibleRouteDay) {
+        setFlexibleRouteDay(false);
+        setExclusivityNote(
+          "Switched to Priority 24-Hour Emergency Dispatch (10% Flexible Route-Day Discount removed because priority emergency trips cannot combine with corridor route pricing)."
+        );
+      } else {
+        setExclusivityNote(null);
+      }
+    } else if (addonId === "priority-24hr-dispatch" && isCurrentlyChecked) {
+      setExclusivityNote(null);
+    }
+
     setAddons((prev) =>
       prev.includes(addonId)
         ? prev.filter((item) => item !== addonId)
         : [...prev, addonId]
     );
+  }
+
+  function handleToggleFlexibleRouteDay() {
+    const nextValue = !flexibleRouteDay;
+    if (nextValue && addons.includes("priority-24hr-dispatch")) {
+      setAddons((prev) =>
+        prev.filter((item) => item !== "priority-24hr-dispatch")
+      );
+      setExclusivityNote(
+        "Applied -10% Flexible Route-Day Discount (Priority 24-Hour Emergency Dispatch unselected automatically)."
+      );
+    } else {
+      setExclusivityNote(null);
+    }
+    setFlexibleRouteDay(nextValue);
   }
 
   function handlePhotoUpload(event: ChangeEvent<HTMLInputElement>) {
@@ -146,6 +225,15 @@ export function QuoteCalculator({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitError(null);
+    setWaiverError(null);
+
+    if (!waiverAccepted) {
+      setWaiverError(
+        "Please accept the Service Terms & Roof-Clearing Liability Waiver before scheduling."
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -161,11 +249,16 @@ export function QuoteCalculator({
           roofPitch,
           snowDepth,
           addons,
+          flexibleRouteDay: quote.flexibleRouteDayApplied,
+          waiverAccepted: true,
           name,
           phone,
           email,
           propertyAddress,
           preferredTiming,
+          urgency: preferredTiming,
+          sourceUrl:
+            typeof window !== "undefined" ? window.location.href : undefined,
           notes: notes.trim() ? notes.trim() : null,
           photoName,
           photoDataUrl,
@@ -188,6 +281,15 @@ export function QuoteCalculator({
         );
         return;
       }
+
+      trackQuoteSubmitted({
+        referenceId: data.referenceId,
+        locationSlug,
+        estimatedLow: data.estimate.low,
+        estimatedHigh: data.estimate.high,
+        urgency: preferredTiming,
+        hasPhoto: Boolean(photoName),
+      });
 
       setSuccessData({
         referenceId: data.referenceId,
@@ -461,12 +563,16 @@ export function QuoteCalculator({
             <div className="space-y-2.5">
               {QUOTE_ADDONS.map((addon) => {
                 const checked = addons.includes(addon.id);
+                const disabledByRouteDiscount =
+                  addon.id === "priority-24hr-dispatch" && flexibleRouteDay;
                 return (
                   <label
                     key={addon.id}
                     className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-all ${
                       checked
                         ? "border-sky-400 bg-sky-500/15"
+                        : disabledByRouteDiscount
+                        ? "border-slate-800 bg-slate-900/40 opacity-75 hover:border-slate-600"
                         : "border-slate-700/80 bg-slate-900/70 hover:border-slate-500"
                     }`}
                   >
@@ -498,10 +604,70 @@ export function QuoteCalculator({
                       <p className="mt-1 text-xs text-slate-400">
                         {addon.description}
                       </p>
+                      {disabledByRouteDiscount ? (
+                        <p className="mt-1 text-[11px] font-medium text-emerald-300">
+                          Selecting Priority Dispatch will automatically replace the
+                          10% Route-Day Discount.
+                        </p>
+                      ) : null}
                     </div>
                   </label>
                 );
               })}
+
+              {/* Highlighted Flexible Route-Day Scheduling Discount Option */}
+              <label
+                className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all ${
+                  quote.flexibleRouteDayApplied
+                    ? "border-emerald-400 bg-emerald-500/15 ring-1 ring-emerald-400/60"
+                    : "border-emerald-500/35 bg-emerald-950/20 hover:border-emerald-400/70"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={quote.flexibleRouteDayApplied}
+                  onChange={handleToggleFlexibleRouteDay}
+                  className="sr-only"
+                />
+                <span
+                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors ${
+                    quote.flexibleRouteDayApplied
+                      ? "border-emerald-400 bg-emerald-400 text-slate-950"
+                      : "border-emerald-500/60 bg-slate-950"
+                  }`}
+                >
+                  {quote.flexibleRouteDayApplied ? (
+                    <Check className="h-3.5 w-3.5 stroke-[3]" />
+                  ) : null}
+                </span>
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-white">
+                      <CalendarCheck className="h-4 w-4 text-emerald-400" />
+                      <span>Flexible Route-Day Scheduling — Save 10%</span>
+                    </span>
+                    <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-extrabold text-emerald-300">
+                      Save 10%
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-300">
+                    Join our scheduled Friday–Sunday Highway 55 corridor crew
+                    runs instead of booking a standalone trip.
+                  </p>
+                  {addons.includes("priority-24hr-dispatch") ? (
+                    <p className="mt-1 text-[11px] font-medium text-amber-300">
+                      Not combinable with Priority 24-Hour Emergency Dispatch—checking
+                      this switches off priority dispatch.
+                    </p>
+                  ) : null}
+                </div>
+              </label>
+
+              {exclusivityNote ? (
+                <p className="rounded-xl border border-amber-500/30 bg-amber-950/25 px-3.5 py-2 text-xs text-amber-200">
+                  {exclusivityNote}
+                </p>
+              ) : null}
             </div>
           </div>
         </div>
@@ -572,6 +738,15 @@ export function QuoteCalculator({
                     </span>
                   </div>
                 ))}
+                {quote.flexibleRouteDayApplied ? (
+                  <div className="flex justify-between font-bold text-emerald-400">
+                    <span>{quote.routeDayDiscountLabel}</span>
+                    <span>
+                      -{formatCurrency(quote.routeDayDiscountLow)} to -
+                      {formatCurrency(quote.routeDayDiscountHigh)}
+                    </span>
+                  </div>
+                ) : null}
               </div>
 
               <div className="mt-4 flex items-start gap-2 rounded-xl border border-slate-800 bg-slate-900/80 p-3 text-xs text-slate-300">
@@ -617,6 +792,7 @@ export function QuoteCalculator({
                 <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
                   <a
                     href={SITE_CONFIG.phoneHref}
+                    onClick={() => trackPhoneClick("quote_confirmation_card")}
                     className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-bold text-slate-950 hover:bg-amber-400"
                   >
                     <Phone className="h-4 w-4" />
@@ -807,9 +983,45 @@ export function QuoteCalculator({
                   />
                 </div>
 
+                {/* Required Roof-Clearing Liability Waiver Consent */}
+                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
+                  <label className="flex cursor-pointer items-start gap-2.5 text-xs leading-relaxed text-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={waiverAccepted}
+                      onChange={(e) => {
+                        setWaiverAccepted(e.target.checked);
+                        if (e.target.checked) setWaiverError(null);
+                      }}
+                      className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-600 bg-slate-900 text-sky-500 accent-sky-500"
+                    />
+                    <span>
+                      I have read and agree to the Idaho Snow Co.{" "}
+                      <Link
+                        href="/terms"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold text-sky-400 underline hover:text-sky-300"
+                      >
+                        Service Terms &amp; Roof-Clearing Liability Waiver
+                      </Link>
+                      , including disclosure of hidden roof obstructions and
+                      snow drop-zones.
+                    </span>
+                  </label>
+                  {waiverError ? (
+                    <p
+                      role="alert"
+                      className="mt-1.5 text-xs font-semibold text-amber-400"
+                    >
+                      {waiverError}
+                    </p>
+                  ) : null}
+                </div>
+
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !waiverAccepted}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 px-5 py-3.5 text-sm font-extrabold text-slate-950 shadow-lg shadow-amber-500/20 hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60 transition-colors"
                 >
                   {isSubmitting ? (
