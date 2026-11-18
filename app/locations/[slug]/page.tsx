@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import {
   AlertTriangle,
   ArrowRight,
+  BookOpen,
   CheckCircle2,
   MapPin,
   MountainSnow,
@@ -14,11 +15,17 @@ import {
 import { QuoteCalculator } from "@/components/QuoteCalculator";
 import { FaqAccordion } from "@/components/FaqAccordion";
 import { JsonLd } from "@/components/JsonLd";
+import { GUIDES } from "@/lib/guides";
 import {
   getLocationBySlug,
   getNeighborLocations,
   LOCATIONS,
 } from "@/lib/locations";
+import {
+  buildBreadcrumbSchema,
+  buildOgImageUrl,
+  buildOgImages,
+} from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/services";
 
 interface LocationPageProps {
@@ -39,46 +46,46 @@ export async function generateMetadata({
 
   if (!location) {
     return {
-      title: "Location Not Found | Idaho Snow Co.",
+      title: "Location Not Found",
     };
   }
 
-  const title = `Roof Snow Removal in ${location.name}, ID | Idaho Snow Co.`;
-  const description = `Roof snow removal, ice dam mitigation & cabin storm monitoring in ${location.name}, Idaho (${location.zipCodes.join(
-    ", "
-  )}). Serving ${location.tagline}. Instant online pricing & fast dispatch.`;
-  const canonicalUrl = `${SITE_CONFIG.domain}/locations/${location.slug}`;
-  const ogImageUrl = `${SITE_CONFIG.domain}/api/og?title=${encodeURIComponent(
-    title
-  )}&subtitle=${encodeURIComponent(
-    `${location.county} • ${location.elevationFt} • ${location.annualSnowfall} Avg Snowfall`
-  )}`;
+  const pageTitle = `Roof Snow Removal in ${location.shortName}, ID`;
+  const fullTitle = `${pageTitle} | Idaho Snow Co.`;
+  const description = `Roof-safe snow removal & ice dam clearing in ${location.shortName}, ID (${location.zipCodes[0]}). Instant online quotes, photo proof & fast Hwy 55 corridor crew dispatch.`;
+  const canonicalPath = `/locations/${location.slug}`;
+  const ogTitle = `Roof Snow Removal in ${location.name}, ID`;
+  const ogSubtitle =
+    "Roof-Safe Snow Clearing & Ice Dam Removal • Instant Quote";
 
   return {
-    title,
+    title: pageTitle,
     description,
     alternates: {
-      canonical: canonicalUrl,
+      canonical: canonicalPath,
     },
     openGraph: {
       type: "website",
-      url: canonicalUrl,
-      title,
+      url: canonicalPath,
+      title: fullTitle,
       description,
-      images: [
-        {
-          url: ogImageUrl,
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
+      images: buildOgImages({
+        title: ogTitle,
+        subtitle: ogSubtitle,
+        category: `${location.county} • ${location.zipCodes[0]}`,
+      }),
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: fullTitle,
       description,
-      images: [ogImageUrl],
+      images: [
+        buildOgImageUrl({
+          title: ogTitle,
+          subtitle: ogSubtitle,
+          category: `${location.county} • ${location.zipCodes[0]}`,
+        }),
+      ],
     },
   };
 }
@@ -122,12 +129,24 @@ export default async function LocationDetailPage({ params }: LocationPageProps) 
       name: `${location.name}, ID`,
       postalCode: location.zipCodes.join(", "),
     },
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "USD",
+      lowPrice: "425",
+      highPrice: "1850",
+    },
     url: `${SITE_CONFIG.domain}/locations/${location.slug}`,
   };
 
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Service Areas", path: "/locations" },
+    { name: `${location.name}, ID`, path: `/locations/${location.slug}` },
+  ]);
+
   return (
     <div className="bg-[#F8FAFC] pb-20">
-      <JsonLd data={[serviceSchema, faqSchema]} />
+      <JsonLd data={[serviceSchema, faqSchema, breadcrumbSchema]} />
 
       {/* Local SEO Hero */}
       <section className="relative overflow-hidden bg-[#0F172A] px-4 py-14 text-white sm:px-6 lg:px-8 lg:py-20">
@@ -339,6 +358,28 @@ export default async function LocationDetailPage({ params }: LocationPageProps) 
                   >
                     <span>{neighbor.name}</span>
                     <ArrowRight className="h-3.5 w-3.5 text-sky-600" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Local Winter Guides Block */}
+            <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
+              <div className="flex items-center gap-2 text-sky-700">
+                <BookOpen className="h-4 w-4" />
+                <h2 className="text-lg font-extrabold text-slate-900">
+                  Winter Roof Guides for {location.shortName}
+                </h2>
+              </div>
+              <div className="mt-3 space-y-2">
+                {GUIDES.map((g) => (
+                  <Link
+                    key={g.slug}
+                    href={`/guides/${g.slug}`}
+                    className="flex items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-2.5 text-xs font-semibold text-slate-700 hover:border-sky-300 hover:bg-white hover:text-sky-700 transition-colors"
+                  >
+                    <span>{g.shortTitle}</span>
+                    <ArrowRight className="h-3.5 w-3.5 shrink-0 text-sky-600" />
                   </Link>
                 ))}
               </div>

@@ -15,6 +15,11 @@ import { FaqAccordion } from "@/components/FaqAccordion";
 import { JsonLd } from "@/components/JsonLd";
 import { getGuideBySlug, GUIDES } from "@/lib/guides";
 import { getLocationBySlug, type LocationData } from "@/lib/locations";
+import {
+  buildBreadcrumbSchema,
+  buildOgImageUrl,
+  buildOgImages,
+} from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/services";
 
 interface GuidePageProps {
@@ -34,34 +39,42 @@ export async function generateMetadata({
   const guide = getGuideBySlug(slug);
 
   if (!guide) {
-    return { title: "Guide Not Found | Idaho Snow Co." };
+    return { title: "Guide Not Found" };
   }
 
-  const canonicalUrl = `${SITE_CONFIG.domain}/guides/${guide.slug}`;
-  const ogImageUrl = `${SITE_CONFIG.domain}/api/og?title=${encodeURIComponent(
-    guide.shortTitle
-  )}&subtitle=${encodeURIComponent(guide.category + " • Idaho Snow Co.")}`;
+  const canonicalPath = `/guides/${guide.slug}`;
+  const fullTitle = `${guide.shortTitle} | Idaho Snow Co.`;
+  const ogSubtitle = "Idaho Snow Co. Winter Guide";
 
   return {
-    title: `${guide.title} | Idaho Snow Co.`,
+    title: guide.shortTitle,
     description: guide.description,
     alternates: {
-      canonical: canonicalUrl,
+      canonical: canonicalPath,
     },
     openGraph: {
       type: "article",
-      url: canonicalUrl,
-      title: guide.title,
+      url: canonicalPath,
+      title: fullTitle,
       description: guide.description,
       publishedTime: guide.publishedAt,
       modifiedTime: guide.updatedAt,
+      images: buildOgImages({
+        title: guide.title,
+        subtitle: ogSubtitle,
+        category: guide.category,
+      }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: fullTitle,
+      description: guide.description,
       images: [
-        {
-          url: ogImageUrl,
-          width: 1200,
-          height: 630,
-          alt: guide.title,
-        },
+        buildOgImageUrl({
+          title: guide.title,
+          subtitle: ogSubtitle,
+          category: guide.category,
+        }),
       ],
     },
   };
@@ -115,11 +128,17 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
     })),
   };
 
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Winter Guides", path: "/guides" },
+    { name: guide.shortTitle, path: `/guides/${guide.slug}` },
+  ]);
+
   const midPointIndex = Math.floor(guide.sections.length / 2);
 
   return (
     <div className="bg-[#F8FAFC] pb-20">
-      <JsonLd data={[articleSchema, faqSchema]} />
+      <JsonLd data={[articleSchema, faqSchema, breadcrumbSchema]} />
 
       <section className="bg-[#0F172A] px-4 py-12 text-white sm:px-6 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-4xl">

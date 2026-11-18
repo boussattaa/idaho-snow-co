@@ -698,7 +698,7 @@ export const LOCATIONS: LocationData[] = [
   {
     slug: "bogus-basin",
     name: "Bogus Basin & Boise Foothills",
-    shortName: "Bogus Basin / Foothills",
+    shortName: "Bogus Basin",
     county: "Ada & Boise County",
     zipCodes: ["83702", "83714"],
     corridorZone: "zone-3-boise-basin-foothills",

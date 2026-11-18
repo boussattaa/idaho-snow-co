@@ -1,14 +1,39 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, FileCheck2, Phone, ShieldAlert, ShieldCheck } from "lucide-react";
+import { buildOgImageUrl, buildOgImages } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/services";
 
+const TERMS_DESC =
+  "Review Idaho Snow Co. roof snow removal & ice dam service terms, hidden obstruction disclosures, safe-depth buffer rules & snow drop-zone waiver.";
+
 export const metadata: Metadata = {
-  title: "Service Terms & Roof-Clearing Liability Waiver | Idaho Snow Co.",
-  description:
-    "Service terms, pre-existing roof condition disclosures, snow drop-zone responsibilities, safe-depth margin policy, and liability waiver for Idaho Snow Co. roof snow and ice dam clearing.",
+  title: "Service Terms & Liability Waiver",
+  description: TERMS_DESC,
   alternates: {
-    canonical: `${SITE_CONFIG.domain}/terms`,
+    canonical: "/terms",
+  },
+  openGraph: {
+    title: "Service Terms & Liability Waiver | Idaho Snow Co.",
+    description: TERMS_DESC,
+    url: "/terms",
+    images: buildOgImages({
+      title: "Service Terms & Liability Waiver",
+      subtitle: "Idaho Snow Co. Roof Snow & Ice Dam Clearing Disclosures",
+      category: "Terms & Disclosures",
+    }),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Service Terms & Liability Waiver | Idaho Snow Co.",
+    description: TERMS_DESC,
+    images: [
+      buildOgImageUrl({
+        title: "Service Terms & Liability Waiver",
+        subtitle: "Idaho Snow Co. Roof Snow & Ice Dam Clearing Disclosures",
+        category: "Terms & Disclosures",
+      }),
+    ],
   },
 };
 

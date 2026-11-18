@@ -1,0 +1,41 @@
+# Idaho Snow Co.
+
+> Professional roof snow removal, ice dam mitigation, and second-home cabin storm monitoring serving the Highway 55 corridor and Boise Basin communities from Boise to McCall, Idaho.
+
+## Business Details
+- **Name:** Idaho Snow Co.
+- **Website:** https://idahosnowco.com
+- **Phone (Call / Text Dispatch):** (208) 965-4285
+- **Email:** Boussattaa@gmail.com
+- **Hours:** 24/7 Winter Storm & Emergency Dispatch
+
+## Core Services & Typical Pricing
+- **Roof Snow Removal** (`https://idahosnowco.com/services/roof-snow-removal`): Non-marring HDPE polymer shovels and cushioned roof rakes; preserves a 1.5–2 in. protective cushion on architectural shingles and cedar shake; balanced two-slope unloading to prevent truss racking. Base quotes start around $425 depending on footprint, pitch, material, snow depth, and travel zone.
+- **Ice Dam Mitigation & Eave Relief** (`https://idahosnowco.com/services/ice-dam-removal`): Safe eave band snow clearing and precision vertical meltwater relief channels without axes, hammers, or corrosive rock salt.
+- **Out-of-Town Cabin Snow Monitoring** (`https://idahosnowco.com/services/cabin-snow-monitoring`): Storm-threshold automated roof inspections, timestamped before-and-after photo proof, and online Stripe invoicing for Boise and out-of-state owners and Airbnb/VRBO hosts.
+- **Flexible Route-Day Scheduling Discount:** Save 10% (`ROUTE_DAY_DISCOUNT_RATE = 0.10`) when joining scheduled Friday–Sunday Highway 55 corridor runs (not combinable with Priority 24-Hour Emergency Dispatch).
+
+## Interactive Tools
+- **Instant Roof Quote Calculator:** https://idahosnowco.com/quote
+- **Idaho Roof Snow-Load (PSF) Calculator:** https://idahosnowco.com/snow-load-calculator
+- **STR Hosts, HOAs & Property Managers:** https://idahosnowco.com/property-managers
+- **Service Terms & Roof-Clearing Liability Waiver:** https://idahosnowco.com/terms
+
+## Service Areas (11 Mountain Towns Covered)
+- **McCall, ID (83638):** https://idahosnowco.com/locations/mccall — Payette Lake, Brundage Mountain, Ponderosa State Park, 100–150 psf design load
+- **Donnelly, ID (83615):** https://idahosnowco.com/locations/donnelly — Tamarack Resort, Lake Cascade West Side, Roseberry, 95–140 psf
+- **Cascade, ID (83611):** https://idahosnowco.com/locations/cascade — Lake Cascade, Warm Lake, Crown Point, Clear Creek, 85–130 psf
+- **Lake Fork, ID (83635):** https://idahosnowco.com/locations/lake-fork — Highway 55 valley floor between Donnelly and McCall, 100–130 psf
+- **New Meadows, ID (83654):** https://idahosnowco.com/locations/new-meadows — MeadowCreek Golf Resort, Hwy 55/95 junction, 80–120 psf
+- **Garden Valley, ID (83622):** https://idahosnowco.com/locations/garden-valley — South Fork Payette, Terrace Lakes Resort, 65–95 psf
+- **Crouch, ID (83622):** https://idahosnowco.com/locations/crouch — Middle Fork Payette, shaded pine-canopy cabins, 70–100 psf
+- **Smiths Ferry, ID (83611):** https://idahosnowco.com/locations/smiths-ferry — Hwy 55 North Fork canyon & riverfront cabins, 90–125 psf
+- **Idaho City, ID (83631):** https://idahosnowco.com/locations/idaho-city — Hwy 21, Wilderness Ranch, Robie Creek, Boise Basin, 80–120 psf
+- **Lowman, ID (83637):** https://idahosnowco.com/locations/lowman — South Fork Payette deep-snow remote cabins, 95–135 psf
+- **Bogus Basin & Boise Foothills (83702 / 83714):** https://idahosnowco.com/locations/bogus-basin — High-elevation foothill & flat/low-slope roofs, 50–130 psf
+
+## Technical Winter Guides
+- https://idahosnowco.com/guides/how-much-snow-can-an-idaho-cabin-roof-hold
+- https://idahosnowco.com/guides/metal-vs-shingle-roof-snow-removal-guide
+- https://idahosnowco.com/guides/preventing-ice-dams-mccall-cascade-cabins
+- https://idahosnowco.com/guides/out-of-town-cabin-owner-winter-roof-checklist

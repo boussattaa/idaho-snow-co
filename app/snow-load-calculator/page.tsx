@@ -4,21 +4,39 @@ import { ArrowRight, MapPin, MountainSnow, Scale } from "lucide-react";
 import { JsonLd } from "@/components/JsonLd";
 import { SnowLoadCalculator } from "@/components/SnowLoadCalculator";
 import { LOCATIONS } from "@/lib/locations";
+import { buildBreadcrumbSchema, buildOgImageUrl, buildOgImages } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/services";
 
+const PSF_DESCRIPTION =
+  "Calculate how many lbs/sq ft (PSF) and tons of snow sit on your cabin roof in McCall, Donnelly, Cascade & Garden Valley—plus get an instant quote.";
+
 export const metadata: Metadata = {
-  title:
-    "Idaho Roof Snow-Load (PSF) Calculator | How Heavy Is Snow on Your Cabin Roof?",
-  description:
-    "Free interactive roof snow-load calculator in lbs per square foot (PSF) for McCall, Donnelly, Cascade, Garden Valley, Idaho City & Boise Foothills cabins.",
+  title: "Idaho Roof Snow-Load (PSF) Calculator",
+  description: PSF_DESCRIPTION,
   alternates: {
-    canonical: `${SITE_CONFIG.domain}/snow-load-calculator`,
+    canonical: "/snow-load-calculator",
   },
   openGraph: {
     title: "Idaho Roof Snow-Load (PSF) Calculator | Idaho Snow Co.",
-    description:
-      "Calculate how many tons of snow sit on your mountain cabin roof across powder, wet Cascade/McCall snow, and rain-on-snow ice.",
-    url: `${SITE_CONFIG.domain}/snow-load-calculator`,
+    description: PSF_DESCRIPTION,
+    url: "/snow-load-calculator",
+    images: buildOgImages({
+      title: "Idaho Roof Snow-Load Calculator",
+      subtitle: "Check How Many lbs/sq ft Are Sitting on Your Cabin Roof",
+      category: "Structural PSF Tool",
+    }),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Idaho Roof Snow-Load (PSF) Calculator | Idaho Snow Co.",
+    description: PSF_DESCRIPTION,
+    images: [
+      buildOgImageUrl({
+        title: "Idaho Roof Snow-Load Calculator",
+        subtitle: "Check How Many lbs/sq ft Are Sitting on Your Cabin Roof",
+        category: "Structural PSF Tool",
+      }),
+    ],
   },
 };
 
@@ -44,9 +62,14 @@ export default function SnowLoadCalculatorPage() {
     },
   };
 
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Snow-Load Calculator", path: "/snow-load-calculator" },
+  ]);
+
   return (
     <div className="bg-[#F8FAFC] pb-20">
-      <JsonLd data={webAppSchema} />
+      <JsonLd data={[webAppSchema, breadcrumbSchema]} />
 
       <section className="bg-[#0F172A] px-4 py-14 text-white sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">

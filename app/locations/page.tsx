@@ -1,23 +1,53 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, MapPin, MountainSnow, Phone } from "lucide-react";
+import { JsonLd } from "@/components/JsonLd";
 import { getLocationsByCorridorZone } from "@/lib/locations";
+import { buildBreadcrumbSchema, buildOgImageUrl, buildOgImages } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/services";
 
+const LOCATIONS_DESCRIPTION =
+  "Serving 11 Idaho mountain towns from Boise Foothills & Idaho City to Garden Valley, Cascade, Donnelly, Tamarack & McCall. Get an instant roof quote.";
+
 export const metadata: Metadata = {
-  title: "Idaho Roof Snow Removal Service Areas (Boise to McCall) | Idaho Snow Co.",
-  description:
-    "Explore all 11 Highway 55 and Boise Basin mountain communities served by Idaho Snow Co., including McCall, Donnelly, Cascade, Garden Valley, Crouch, Idaho City & Bogus Basin.",
+  title: "Highway 55 Roof Snow Service Areas",
+  description: LOCATIONS_DESCRIPTION,
   alternates: {
-    canonical: `${SITE_CONFIG.domain}/locations`,
+    canonical: "/locations",
+  },
+  openGraph: {
+    title: "Highway 55 Roof Snow Service Areas | Idaho Snow Co.",
+    description: LOCATIONS_DESCRIPTION,
+    url: "/locations",
+    images: buildOgImages({
+      title: "Highway 55 & Boise Basin Service Areas",
+      subtitle: "McCall • Donnelly • Cascade • Garden Valley • Boise Foothills",
+    }),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Highway 55 Roof Snow Service Areas | Idaho Snow Co.",
+    description: LOCATIONS_DESCRIPTION,
+    images: [
+      buildOgImageUrl({
+        title: "Highway 55 & Boise Basin Service Areas",
+        subtitle:
+          "McCall • Donnelly • Cascade • Garden Valley • Boise Foothills",
+      }),
+    ],
   },
 };
 
 export default function LocationsHubPage() {
   const groups = getLocationsByCorridorZone();
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Service Areas", path: "/locations" },
+  ]);
 
   return (
     <div className="bg-[#F8FAFC] pb-20">
+      <JsonLd data={breadcrumbSchema} />
       <section className="bg-[#0F172A] px-4 py-14 text-white sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-sky-300">

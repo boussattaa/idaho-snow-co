@@ -1,13 +1,38 @@
 import type { Metadata } from "next";
 import { ServiceLandingTemplate } from "@/components/ServiceLandingTemplate";
-import { getServiceBySlug, SITE_CONFIG } from "@/lib/services";
+import { buildOgImageUrl, buildOgImages } from "@/lib/seo";
+import { getServiceBySlug } from "@/lib/services";
+
+const DESC =
+  "Non-marring roof snow removal for standing seam metal, shingle & cedar shake cabins in McCall, Donnelly, Cascade & Garden Valley. Instant quote.";
 
 export const metadata: Metadata = {
-  title: "Roof Snow Removal in McCall, Cascade & Boise Foothills | Idaho Snow Co.",
-  description:
-    "Non-marring roof snow shoveling, cushioned raking, and heavy structural load relief for standing seam metal, shingles & cedar shake along Hwy 55. Instant online pricing.",
+  title: "Roof Snow Removal (McCall to Boise)",
+  description: DESC,
   alternates: {
-    canonical: `${SITE_CONFIG.domain}/services/roof-snow-removal`,
+    canonical: "/services/roof-snow-removal",
+  },
+  openGraph: {
+    title: "Roof Snow Removal (McCall to Boise) | Idaho Snow Co.",
+    description: DESC,
+    url: "/services/roof-snow-removal",
+    images: buildOgImages({
+      title: "Roof-Safe Mountain Snow Removal",
+      subtitle: "Standing Seam Metal, Shingle & Cedar Shake Specialists",
+      category: "Roof Snow Removal",
+    }),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Roof Snow Removal (McCall to Boise) | Idaho Snow Co.",
+    description: DESC,
+    images: [
+      buildOgImageUrl({
+        title: "Roof-Safe Mountain Snow Removal",
+        subtitle: "Standing Seam Metal, Shingle & Cedar Shake Specialists",
+        category: "Roof Snow Removal",
+      }),
+    ],
   },
 };
 

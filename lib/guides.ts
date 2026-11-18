@@ -35,7 +35,7 @@ export const GUIDES: GuideArticle[] = [
     title: "How Much Snow Can an Idaho Cabin Roof Hold? (PSF Guide & Warning Signs)",
     shortTitle: "How Much Snow Can an Idaho Roof Hold?",
     description:
-      "Learn Idaho mountain cabin roof snow-load limits in pounds per square foot (PSF), why wet February rain-on-snow events spike structural weight in McCall and Cascade, and 5 warning signs to act immediately.",
+      "Learn Idaho cabin roof snow-load limits in lbs/sq ft (PSF), why wet rain-on-snow events spike weight in McCall & Cascade, and 5 key warning signs.",
     category: "Structural Snow Load",
     readTime: "6 min read",
     publishedAt: "2026-11-01",
@@ -113,7 +113,7 @@ export const GUIDES: GuideArticle[] = [
       "Standing Seam Metal vs. Architectural Shingle Roof Snow Removal Guide",
     shortTitle: "Metal vs. Shingle Snow Removal",
     description:
-      "Discover the right tools and safe snow-cushion protocols for clearing standing seam metal, architectural asphalt shingles, cedar wood shake, and flat mountain roofs without voiding warranties.",
+      "How to clear standing seam metal, architectural shingle & cedar shake roofs in McCall, Tamarack & Garden Valley without voiding roof warranties.",
     category: "Roof Material Care",
     readTime: "5 min read",
     publishedAt: "2026-11-02",
@@ -176,7 +176,7 @@ export const GUIDES: GuideArticle[] = [
       "Preventing & Safely Removing Ice Dams on McCall, Cascade & Garden Valley Cabins",
     shortTitle: "Preventing & Removing Ice Dams",
     description:
-      "Why Highway 55 and Boise Basin cabins develop severe eave and pine-needle ice dams—plus why axes and rock salt destroy roofs compared to safe relief channeling.",
+      "Why McCall, Cascade & Garden Valley cabins form severe eave and pine-needle ice dams—plus safe drainage channeling vs. damaging axes & rock salt.",
     category: "Ice Dam Mitigation",
     readTime: "6 min read",
     publishedAt: "2026-11-04",
@@ -239,7 +239,7 @@ export const GUIDES: GuideArticle[] = [
       "The Out-of-Town Cabin Owner & STR Host Winter Roof Checklist (Boise to McCall)",
     shortTitle: "Out-of-Town Cabin Winter Checklist",
     description:
-      "Essential winter roof, propane tank, deck, and photo-documentation checklist for Boise and out-of-state second-home owners and Airbnb/VRBO hosts in McCall, Tamarack, and Garden Valley.",
+      "Essential winter roof, propane, deck & photo-proof checklist for out-of-town second-home owners and Airbnb/VRBO hosts from Garden Valley to McCall.",
     category: "Second Homes & STRs",
     readTime: "5 min read",
     publishedAt: "2026-11-06",

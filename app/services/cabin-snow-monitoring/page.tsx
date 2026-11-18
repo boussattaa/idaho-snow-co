@@ -1,13 +1,38 @@
 import type { Metadata } from "next";
 import { ServiceLandingTemplate } from "@/components/ServiceLandingTemplate";
-import { getServiceBySlug, SITE_CONFIG } from "@/lib/services";
+import { buildOgImageUrl, buildOgImages } from "@/lib/seo";
+import { getServiceBySlug } from "@/lib/services";
+
+const DESC =
+  "Automated storm-triggered roof checks, before/after photo proof & Stripe invoicing for second homes in McCall, Tamarack, Cascade & Garden Valley.";
 
 export const metadata: Metadata = {
-  title: "Out-of-Town Cabin Snow Monitoring & STR Roof Care | Idaho Snow Co.",
-  description:
-    "Automated storm-triggered roof snow checks, timestamped before/after photo proof, and online Stripe invoicing for second-home & Airbnb/VRBO owners in McCall, Tamarack & Garden Valley.",
+  title: "Out-of-Town Cabin Snow Monitoring",
+  description: DESC,
   alternates: {
-    canonical: `${SITE_CONFIG.domain}/services/cabin-snow-monitoring`,
+    canonical: "/services/cabin-snow-monitoring",
+  },
+  openGraph: {
+    title: "Out-of-Town Cabin Snow Monitoring | Idaho Snow Co.",
+    description: DESC,
+    url: "/services/cabin-snow-monitoring",
+    images: buildOgImages({
+      title: "Out-of-Town Cabin Snow Monitoring",
+      subtitle: "Automated Storm Checks & Timestamped Photo Proof",
+      category: "2nd Homes & STRs",
+    }),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Out-of-Town Cabin Snow Monitoring | Idaho Snow Co.",
+    description: DESC,
+    images: [
+      buildOgImageUrl({
+        title: "Out-of-Town Cabin Snow Monitoring",
+        subtitle: "Automated Storm Checks & Timestamped Photo Proof",
+        category: "2nd Homes & STRs",
+      }),
+    ],
   },
 };
 

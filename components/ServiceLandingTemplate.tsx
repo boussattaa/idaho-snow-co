@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, MapPin, Phone, ShieldCheck } from "lucide-react";
+import { ArrowRight, BookOpen, CheckCircle2, MapPin, Phone, Scale, ShieldCheck } from "lucide-react";
 import { QuoteCalculator } from "@/components/QuoteCalculator";
 import { FaqAccordion } from "@/components/FaqAccordion";
 import { JsonLd } from "@/components/JsonLd";
 import { LOCATIONS } from "@/lib/locations";
+import { buildBreadcrumbSchema } from "@/lib/seo";
 import { SITE_CONFIG, type ServiceDefinition } from "@/lib/services";
 
 interface ServiceLandingTemplateProps {
@@ -48,9 +49,14 @@ export function ServiceLandingTemplate({
     })),
   };
 
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: service.title, path: service.href },
+  ]);
+
   return (
     <div className="bg-[#F8FAFC] pb-20">
-      <JsonLd data={[serviceSchema, faqSchema]} />
+      <JsonLd data={[serviceSchema, faqSchema, breadcrumbSchema]} />
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-[#0F172A] px-4 py-14 text-white sm:px-6 lg:px-8 lg:py-20">
@@ -130,6 +136,22 @@ export function ServiceLandingTemplate({
               </div>
             ))}
           </div>
+          <div className="mt-5 flex flex-wrap gap-3 border-t border-slate-100 pt-5">
+            <Link
+              href="/snow-load-calculator"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2 text-xs font-bold text-sky-800 hover:bg-sky-100"
+            >
+              <Scale className="h-3.5 w-3.5" />
+              <span>Calculate Roof PSF Snow Weight</span>
+            </Link>
+            <Link
+              href="/guides"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100"
+            >
+              <BookOpen className="h-3.5 w-3.5 text-sky-600" />
+              <span>Read Winter Roof &amp; Ice Dam Guides</span>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -160,6 +182,22 @@ export function ServiceLandingTemplate({
                 </span>
               </Link>
             ))}
+          </div>
+          <div className="mt-5 flex flex-wrap gap-3 border-t border-slate-100 pt-5">
+            <Link
+              href="/snow-load-calculator"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2 text-xs font-bold text-sky-800 hover:bg-sky-100"
+            >
+              <Scale className="h-3.5 w-3.5" />
+              <span>Calculate Roof PSF Snow Weight</span>
+            </Link>
+            <Link
+              href="/guides"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100"
+            >
+              <BookOpen className="h-3.5 w-3.5 text-sky-600" />
+              <span>Read Winter Roof &amp; Ice Dam Guides</span>
+            </Link>
           </div>
         </div>
       </section>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Idaho Snow Co. Emblem">
+  <rect width="64" height="64" rx="14" fill="#0F172A"/>
+  <!-- Glacier blue snowflake star at crest -->
+  <g stroke="#0EA5E9" stroke-width="2.5" stroke-linecap="round">
+    <line x1="32" y1="9" x2="32" y2="21"/>
+    <line x1="26.8" y1="12" x2="37.2" y2="18"/>
+    <line x1="37.2" y1="12" x2="26.8" y2="18"/>
+  </g>
+  <!-- Crisp snow-white alpine twin peaks -->
+  <polygon points="10,49 27,24 37,37 44,28 54,49" fill="#F8FAFC"/>
+  <!-- Glacier blue shadow facet -->
+  <polygon points="27,24 37,37 32,49 21,49" fill="#0EA5E9" opacity="0.28"/>
+  <rect x="10" y="47" width="44" height="4" rx="2" fill="#0EA5E9"/>
+</svg>

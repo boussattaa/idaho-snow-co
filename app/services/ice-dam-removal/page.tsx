@@ -1,13 +1,40 @@
 import type { Metadata } from "next";
 import { ServiceLandingTemplate } from "@/components/ServiceLandingTemplate";
-import { getServiceBySlug, SITE_CONFIG } from "@/lib/services";
+import { buildOgImageUrl, buildOgImages } from "@/lib/seo";
+import { getServiceBySlug } from "@/lib/services";
+
+const DESC =
+  "Safe ice dam removal & eave drainage channeling for McCall, Donnelly, Cascade & Garden Valley cabins. Zero shingle damage—get an instant quote.";
 
 export const metadata: Metadata = {
-  title: "Ice Dam Removal & Eave Prevention (Boise to McCall) | Idaho Snow Co.",
-  description:
-    "Safe ice dam removal, eave snow band clearing, and gutter drainage channel relief across McCall, Donnelly, Garden Valley, Crouch & Idaho City without damaging shingles.",
+  title: "Ice Dam Removal & Eave Relief",
+  description: DESC,
   alternates: {
-    canonical: `${SITE_CONFIG.domain}/services/ice-dam-removal`,
+    canonical: "/services/ice-dam-removal",
+  },
+  openGraph: {
+    title: "Ice Dam Removal & Eave Relief | Idaho Snow Co.",
+    description: DESC,
+    url: "/services/ice-dam-removal",
+    images: buildOgImages({
+      title: "Ice Dam Removal & Eave Prevention",
+      subtitle:
+        "Safe Drainage Channeling Across McCall, Cascade & Garden Valley",
+      category: "Ice Dam Mitigation",
+    }),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ice Dam Removal & Eave Relief | Idaho Snow Co.",
+    description: DESC,
+    images: [
+      buildOgImageUrl({
+        title: "Ice Dam Removal & Eave Prevention",
+        subtitle:
+          "Safe Drainage Channeling Across McCall, Cascade & Garden Valley",
+        category: "Ice Dam Mitigation",
+      }),
+    ],
   },
 };
 

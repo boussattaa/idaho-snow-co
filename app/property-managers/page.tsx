@@ -13,15 +13,39 @@ import {
 import { PropertyManagerForm } from "@/components/PropertyManagerForm";
 import { JsonLd } from "@/components/JsonLd";
 import { LOCATIONS } from "@/lib/locations";
+import { buildBreadcrumbSchema, buildOgImageUrl, buildOgImages } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/services";
 
+const PM_DESCRIPTION =
+  "Priority roof snow removal, storm checks, timestamped photo proof & Stripe billing for McCall, Tamarack, Cascade & Garden Valley STR hosts and HOAs.";
+
 export const metadata: Metadata = {
-  title:
-    "STR Hosts, HOAs & Property Manager Roof Snow Removal (McCall to Boise) | Idaho Snow Co.",
-  description:
-    "Priority winter roof clearing, storm-threshold cabin monitoring, timestamped photo logs & consolidated Stripe invoicing for Airbnb/VRBO hosts, vacation rental managers & HOAs across McCall, Tamarack, Cascade & Garden Valley.",
+  title: "Cabin & STR Winter Roof Monitoring",
+  description: PM_DESCRIPTION,
   alternates: {
-    canonical: `${SITE_CONFIG.domain}/property-managers`,
+    canonical: "/property-managers",
+  },
+  openGraph: {
+    title: "Cabin & STR Winter Roof Monitoring | Idaho Snow Co.",
+    description: PM_DESCRIPTION,
+    url: "/property-managers",
+    images: buildOgImages({
+      title: "Cabin & STR Winter Roof Monitoring",
+      subtitle: "Storm Checks, Photo Proof & Priority Clearing for Idaho Hosts",
+      category: "STR Hosts & HOAs",
+    }),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cabin & STR Winter Roof Monitoring | Idaho Snow Co.",
+    description: PM_DESCRIPTION,
+    images: [
+      buildOgImageUrl({
+        title: "Cabin & STR Winter Roof Monitoring",
+        subtitle: "Storm Checks, Photo Proof & Priority Clearing for Idaho Hosts",
+        category: "STR Hosts & HOAs",
+      }),
+    ],
   },
 };
 
@@ -40,9 +64,14 @@ export default function PropertyManagersPage() {
     url: `${SITE_CONFIG.domain}/property-managers`,
   };
 
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Property Managers & STRs", path: "/property-managers" },
+  ]);
+
   return (
     <div className="bg-[#F8FAFC] pb-20">
-      <JsonLd data={b2bSchema} />
+      <JsonLd data={[b2bSchema, breadcrumbSchema]} />
 
       {/* B2B Hero */}
       <section className="bg-[#0F172A] px-4 py-14 text-white sm:px-6 lg:px-8 lg:py-20">

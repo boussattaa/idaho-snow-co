@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -21,7 +22,43 @@ import { QuoteCalculator } from "@/components/QuoteCalculator";
 import { FaqAccordion } from "@/components/FaqAccordion";
 import { JsonLd } from "@/components/JsonLd";
 import { getLocationsByCorridorZone } from "@/lib/locations";
+import { buildOgImageUrl, buildOgImages } from "@/lib/seo";
 import { HOMEPAGE_FAQS, SERVICES, SITE_CONFIG } from "@/lib/services";
+
+const HOME_TITLE = "Idaho Snow Co. | Roof Snow & Ice Dam Removal (McCall, ID)";
+const HOME_DESCRIPTION =
+  "Roof-safe snow & ice dam removal across Highway 55 from Boise to McCall, Donnelly, Cascade & Garden Valley. Get your instant online quote in 60 seconds.";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: HOME_TITLE,
+  },
+  description: HOME_DESCRIPTION,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    url: "/",
+    images: buildOgImages({
+      title: "Roof Snow & Ice Dam Removal",
+      subtitle: "McCall • Donnelly • Cascade • Garden Valley | Instant Online Quotes",
+      alt: "Idaho Snow Co. — Roof Snow & Ice Dam Removal",
+    }),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    images: [
+      buildOgImageUrl({
+        title: "Roof Snow & Ice Dam Removal",
+        subtitle: "McCall • Donnelly • Cascade • Garden Valley | Instant Online Quotes",
+      }),
+    ],
+  },
+};
 
 export default function HomePage() {
   const corridorGroups = getLocationsByCorridorZone();

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { MobileStickyBar } from "@/components/MobileStickyBar";
 import { JsonLd } from "@/components/JsonLd";
 import { LOCATIONS } from "@/lib/locations";
+import { buildOgImageUrl, buildOgImages } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/services";
 
 const inter = Inter({
@@ -15,49 +16,65 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const ogImageUrl = `${SITE_CONFIG.domain}/api/og?title=${encodeURIComponent(
-  "Idaho Snow Co. — Roof Snow Removal & Ice Dam Mitigation"
-)}&subtitle=${encodeURIComponent(
-  "Serving Highway 55 & Boise Basin: McCall, Donnelly, Cascade, Garden Valley & Boise Foothills"
-)}`;
+const DEFAULT_TITLE =
+  "Idaho Snow Co. | Roof Snow & Ice Dam Removal (McCall to Boise)";
+const DEFAULT_DESCRIPTION =
+  "Roof-safe snow & ice dam removal across Highway 55 from Boise to McCall, Donnelly, Cascade & Garden Valley. Get your instant online quote in 60 seconds.";
+
+const defaultOgTitle = "Roof Snow & Ice Dam Removal";
+const defaultOgSubtitle =
+  "McCall • Donnelly • Cascade • Garden Valley | Instant Online Quotes";
+
+export const viewport: Viewport = {
+  themeColor: "#0F172A",
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.domain),
   title: {
-    default:
-      "Idaho Snow Co. | Roof Snow Removal & Ice Dam Mitigation (Boise to McCall)",
-    template: "%s",
+    default: DEFAULT_TITLE,
+    template: "%s | Idaho Snow Co.",
   },
-  description:
-    "Professional roof snow removal, ice dam mitigation, and out-of-town cabin storm monitoring serving the Highway 55 corridor from Boise Foothills to McCall, Donnelly, Cascade & Garden Valley. Get an instant online quote.",
+  description: DEFAULT_DESCRIPTION,
   alternates: {
-    canonical: SITE_CONFIG.domain,
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: SITE_CONFIG.domain,
+    url: "/",
     siteName: SITE_CONFIG.businessName,
-    title:
-      "Idaho Snow Co. | Roof Snow Removal & Ice Dam Mitigation (Boise to McCall)",
-    description:
-      "Get an instant transparent roof snow removal quote in 30 seconds. Serving McCall, Donnelly, Tamarack, Cascade, Garden Valley, Crouch & Boise Foothills.",
-    images: [
-      {
-        url: ogImageUrl,
-        width: 1200,
-        height: 630,
-        alt: "Idaho Snow Co. — Roof Snow Removal & Ice Dam Mitigation",
-      },
-    ],
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: buildOgImages({
+      title: defaultOgTitle,
+      subtitle: defaultOgSubtitle,
+      alt: "Idaho Snow Co. — Roof Snow & Ice Dam Removal",
+    }),
   },
   twitter: {
     card: "summary_large_image",
-    title:
-      "Idaho Snow Co. | Roof Snow Removal & Ice Dam Mitigation (Boise to McCall)",
-    description:
-      "Instant roof snow removal quotes & 24-hour dispatch across McCall, Donnelly, Cascade, Garden Valley & Boise Foothills.",
-    images: [ogImageUrl],
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: [
+      buildOgImageUrl({
+        title: defaultOgTitle,
+        subtitle: defaultOgSubtitle,
+      }),
+    ],
   },
 };
 
@@ -81,11 +98,41 @@ export default function RootLayout({
       addressRegion: "ID",
       addressCountry: "US",
     },
-    areaServed: LOCATIONS.map((loc) => ({
-      "@type": "City",
-      name: `${loc.name}, ID`,
-      postalCode: loc.zipCodes.join(", "),
-    })),
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ],
+        opens: "00:00",
+        closes: "23:59",
+      },
+    ],
+    knowsAbout: [
+      "Roof Snow Removal",
+      "Ice Dam Mitigation",
+      "Standing Seam Metal Roof Snow Clearing",
+      "Architectural Shingle Snow Unloading",
+      "Mountain Cabin Storm Monitoring",
+      "Idaho Snow Load PSF Calculations",
+    ],
+    areaServed: [
+      ...LOCATIONS.map((loc) => ({
+        "@type": "City",
+        name: `${loc.name}, ID`,
+        postalCode: loc.zipCodes.join(", "),
+      })),
+      { "@type": "AdministrativeArea", name: "Valley County, ID" },
+      { "@type": "AdministrativeArea", name: "Boise County, ID" },
+      { "@type": "AdministrativeArea", name: "Adams County, ID" },
+      { "@type": "AdministrativeArea", name: "Ada County, ID" },
+    ],
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Winter Roof & Ice Dam Services",

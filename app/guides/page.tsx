@@ -1,22 +1,52 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Calculator, Clock, Scale } from "lucide-react";
+import { JsonLd } from "@/components/JsonLd";
 import { GUIDES } from "@/lib/guides";
-import { SITE_CONFIG } from "@/lib/services";
+import { buildBreadcrumbSchema, buildOgImageUrl, buildOgImages } from "@/lib/seo";
+
+const GUIDES_DESC =
+  "Winter roof guides for Idaho cabin owners: PSF snow load limits, metal vs. shingle safety, McCall & Cascade ice dam prevention & STR checklists.";
 
 export const metadata: Metadata = {
-  title:
-    "Idaho Cabin Winter Roof & Ice Dam Guides | Idaho Snow Co.",
-  description:
-    "Expert guides for Idaho mountain homeowners on roof snow-load PSF limits, standing seam metal vs. shingle clearing, preventing McCall/Cascade ice dams, and out-of-town STR checklists.",
+  title: "Idaho Cabin Roof & Ice Dam Guides",
+  description: GUIDES_DESC,
   alternates: {
-    canonical: `${SITE_CONFIG.domain}/guides`,
+    canonical: "/guides",
+  },
+  openGraph: {
+    title: "Idaho Cabin Roof & Ice Dam Guides | Idaho Snow Co.",
+    description: GUIDES_DESC,
+    url: "/guides",
+    images: buildOgImages({
+      title: "Idaho Cabin Roof & Ice Dam Guides",
+      subtitle: "Idaho Snow Co. Winter Guide",
+      category: "Winter Knowledge Base",
+    }),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Idaho Cabin Roof & Ice Dam Guides | Idaho Snow Co.",
+    description: GUIDES_DESC,
+    images: [
+      buildOgImageUrl({
+        title: "Idaho Cabin Roof & Ice Dam Guides",
+        subtitle: "Idaho Snow Co. Winter Guide",
+        category: "Winter Knowledge Base",
+      }),
+    ],
   },
 };
 
 export default function GuidesHubPage() {
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Winter Guides", path: "/guides" },
+  ]);
+
   return (
     <div className="bg-[#F8FAFC] pb-20">
+      <JsonLd data={breadcrumbSchema} />
       <section className="bg-[#0F172A] px-4 py-14 text-white sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-sky-300">

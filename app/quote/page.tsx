@@ -1,22 +1,54 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AlertTriangle, Clock, Phone, ShieldCheck, Weight } from "lucide-react";
+import { JsonLd } from "@/components/JsonLd";
 import { QuoteCalculator } from "@/components/QuoteCalculator";
 import { QuotePageCalculator } from "@/components/QuotePageCalculator";
+import { buildBreadcrumbSchema, buildOgImageUrl, buildOgImages } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/services";
 
+const QUOTE_DESCRIPTION =
+  "Get an instant roof snow & ice dam removal quote in 60 seconds. Transparent corridor pricing for McCall, Donnelly, Cascade, Tamarack & Garden Valley.";
+
 export const metadata: Metadata = {
-  title: "Instant Roof Snow Removal Quote Calculator | Idaho Snow Co.",
-  description:
-    "Calculate your instant roof snow removal and ice dam mitigation estimate across McCall, Donnelly, Cascade, Garden Valley, Crouch, Idaho City & Boise Foothills.",
+  title: "Instant Roof Snow Removal Quote",
+  description: QUOTE_DESCRIPTION,
   alternates: {
-    canonical: `${SITE_CONFIG.domain}/quote`,
+    canonical: "/quote",
+  },
+  openGraph: {
+    title: "Instant Roof Snow Removal Quote | Idaho Snow Co.",
+    description: QUOTE_DESCRIPTION,
+    url: "/quote",
+    images: buildOgImages({
+      title: "Instant Roof Snow Removal Quote",
+      subtitle: "60-Second Online Estimate • Highway 55 Snow Corridor",
+      category: "Instant Online Quote",
+    }),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Instant Roof Snow Removal Quote | Idaho Snow Co.",
+    description: QUOTE_DESCRIPTION,
+    images: [
+      buildOgImageUrl({
+        title: "Instant Roof Snow Removal Quote",
+        subtitle: "60-Second Online Estimate • Highway 55 Snow Corridor",
+        category: "Instant Online Quote",
+      }),
+    ],
   },
 };
 
 export default function QuotePage() {
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Instant Quote", path: "/quote" },
+  ]);
+
   return (
     <div className="bg-[#F8FAFC] pb-20">
+      <JsonLd data={breadcrumbSchema} />
       <section className="bg-[#0F172A] px-4 py-12 text-white sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div>
