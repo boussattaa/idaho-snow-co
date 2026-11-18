@@ -5,11 +5,11 @@ import Link from "next/link";
 import {
   Calculator,
   Menu,
-  MountainSnow,
   Phone,
   ShieldAlert,
   X,
 } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 import { trackPhoneClick } from "@/lib/analytics";
 import { SERVICES, SITE_CONFIG } from "@/lib/services";
 import { STORM_BANNER_CONFIG } from "@/lib/site-config";
@@ -71,9 +71,7 @@ export function Navbar() {
       {/* Main Nav Bar */}
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-slate-950 shadow-md shadow-sky-500/20">
-            <MountainSnow className="h-6 w-6" />
-          </div>
+          <BrandLogo className="h-10 w-10 shrink-0 rounded-xl shadow-md shadow-sky-500/20 transition-transform group-hover:scale-105" />
           <div>
             <span className="block text-lg font-extrabold tracking-tight text-white leading-none">
               Idaho Snow Co.

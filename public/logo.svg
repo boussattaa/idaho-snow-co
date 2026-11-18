@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Idaho Snow Co. Official Crest Logo">
+  <rect width="512" height="512" rx="108" fill="#0F172A"/>
+  <!-- Outer Hexagonal Crest -->
+  <polygon points="256,44 438,148 438,364 256,468 74,364 74,148" fill="#0B1324" stroke="#7DD3FC" stroke-width="10" stroke-linejoin="round"/>
+  <!-- Safety Amber 4-Point North Star -->
+  <path d="M256,92 L266,120 L294,130 L266,140 L256,168 L246,140 L218,130 L246,120 Z" fill="#F59E0B"/>
+  <!-- Left Jagged Sawtooth Peak -->
+  <polygon points="104,352 162,248 178,266 206,196 250,280 250,352" fill="#F8FAFC"/>
+  <polygon points="206,196 250,280 250,352 178,352 192,292" fill="#7DD3FC" opacity="0.65"/>
+  <!-- Right Jagged Sawtooth Peak -->
+  <polygon points="262,352 262,280 306,196 334,266 350,248 408,352" fill="#F8FAFC"/>
+  <polygon points="306,196 334,266 350,248 408,352 306,352" fill="#38BDF8" opacity="0.72"/>
+  <!-- Center Steep Alpine A-Frame Cabin -->
+  <polygon points="154,352 256,184 358,352" fill="#0F172A"/>
+  <polygon points="164,352 256,196 348,352 320,352 256,244 192,352" fill="#F8FAFC"/>
+  <polygon points="198,352 256,252 314,352" fill="#BAE6FD"/>
+  <polygon points="198,352 256,252 256,352" fill="#F8FAFC"/>
+  <rect x="242" y="308" width="28" height="44" fill="#0F172A"/>
+</svg>

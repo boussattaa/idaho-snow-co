@@ -41,6 +41,14 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/logo.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: ["/logo.png"],
+    apple: [{ url: "/apple-icon", sizes: "180x180", type: "image/png" }],
+  },
   robots: {
     index: true,
     follow: true,
@@ -88,6 +96,8 @@ export default function RootLayout({
     "@type": "HomeAndConstructionBusiness",
     name: SITE_CONFIG.businessName,
     url: SITE_CONFIG.domain,
+    logo: `${SITE_CONFIG.domain}/logo.png`,
+    image: `${SITE_CONFIG.domain}/logo.png`,
     telephone: "+1-208-965-4285",
     email: SITE_CONFIG.email,
     priceRange: "$$",

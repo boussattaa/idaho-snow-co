@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Mail, MapPin, MountainSnow, Phone, ShieldCheck } from "lucide-react";
+import { Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 import { LOCATIONS } from "@/lib/locations";
 import { SERVICES, SITE_CONFIG } from "@/lib/services";
 
@@ -11,9 +12,7 @@ export function Footer() {
           {/* Brand Column */}
           <div className="space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500 text-slate-950">
-                <MountainSnow className="h-6 w-6" />
-              </div>
+              <BrandLogo className="h-10 w-10 shrink-0 rounded-xl shadow-md shadow-sky-500/20" />
               <div>
                 <span className="block text-lg font-extrabold text-white">
                   Idaho Snow Co.
