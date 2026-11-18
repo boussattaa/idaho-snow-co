@@ -207,8 +207,14 @@ async function sendResendEmail(payload: {
   waiverAcceptedAt: string;
 }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return;
+  if (!apiKey) {
+    console.warn("[IdahoSnowCo] RESEND_API_KEY is not set; skipping email notification.");
+    return;
+  }
 
+  const fromAddress =
+    process.env.RESEND_FROM_EMAIL ||
+    "Idaho Snow Co. <alex@premiercleaningpro.com>";
   const toEmail = process.env.NOTIFICATION_EMAIL || SITE_CONFIG.email;
   const estimateString = `${formatCurrency(payload.quoteLow)} – ${formatCurrency(payload.quoteHigh)}`;
 
@@ -217,7 +223,7 @@ async function sendResendEmail(payload: {
       ? payload.parsed.addons.join(", ")
       : "None selected";
 
-  const html = `
+  const dispatchHtml = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 620px; margin: 0 auto; color: #0F172A;">
       <div style="background: #0F172A; color: #F8FAFC; padding: 20px 24px; border-radius: 12px 12px 0 0;">
         <p style="margin: 0; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #38BDF8;">Idaho Snow Co. Dispatch Alert</p>
@@ -253,20 +259,65 @@ async function sendResendEmail(payload: {
     </div>
   `;
 
-  await fetch("https://api.resend.com/emails", {
+  const dispatchRes = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Idaho Snow Co. Alerts <alerts@idahosnowco.com>",
+      from: fromAddress,
       to: [toEmail],
       reply_to: payload.parsed.email,
       subject: `[${payload.referenceId}] ${payload.locationName} Snow Quote (${estimateString}) — ${payload.parsed.name}`,
-      html,
+      html: dispatchHtml,
     }),
   });
+
+  if (!dispatchRes.ok) {
+    const errText = await dispatchRes.text();
+    console.error("[IdahoSnowCo] Resend dispatch email error:", dispatchRes.status, errText);
+  }
+
+  // Also send an instant confirmation receipt directly to the property owner if their email differs
+  if (payload.parsed.email.toLowerCase() !== toEmail.toLowerCase()) {
+    const customerHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 620px; margin: 0 auto; color: #0F172A;">
+        <div style="background: #0F172A; color: #F8FAFC; padding: 20px 24px; border-radius: 12px 12px 0 0;">
+          <p style="margin: 0; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #38BDF8;">Idaho Snow Co.</p>
+          <h1 style="margin: 6px 0 0; font-size: 20px;">Your Quote Is Locked: ${estimateString}</h1>
+        </div>
+        <div style="border: 1px solid #E2E8F0; border-top: none; padding: 24px; border-radius: 0 0 12px 12px; background: #FFFFFF;">
+          <p>Hi ${payload.parsed.name},</p>
+          <p>Thanks for booking with <strong>Idaho Snow Co.</strong> Your roof snow clearing request for <strong>${payload.parsed.propertyAddress}</strong> (${payload.locationName}) is confirmed with reference <strong>${payload.referenceId}</strong>.</p>
+          <p><strong>Estimated Range:</strong> ${estimateString}${payload.flexibleRouteDay ? " (includes -10% Route-Day Discount)" : ""}<br/>
+          <strong>Timing:</strong> ${payload.parsed.urgency || payload.parsed.preferredTiming}</p>
+          <p>Our Highway 55 dispatch coordinator will text/call you to confirm your crew arrival window. You&apos;ll receive timestamped before-and-after roof photos and a Stripe invoice upon completion.</p>
+          <p style="margin-top: 16px;">Need urgent leak help? Call or text <strong>(208) 965-4285</strong>.</p>
+        </div>
+      </div>
+    `;
+
+    const customerRes = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: fromAddress,
+        to: [payload.parsed.email],
+        reply_to: toEmail,
+        subject: `Quote Confirmed (${payload.referenceId}): ${estimateString} — Idaho Snow Co.`,
+        html: customerHtml,
+      }),
+    });
+
+    if (!customerRes.ok) {
+      const errText = await customerRes.text();
+      console.error("[IdahoSnowCo] Resend customer email error:", customerRes.status, errText);
+    }
+  }
 }
 
 async function sendTwilioSms(payload: {
