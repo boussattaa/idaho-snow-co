@@ -140,7 +140,7 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
     <div className="bg-[#F8FAFC] pb-20">
       <JsonLd data={[articleSchema, faqSchema, breadcrumbSchema]} />
 
-      <section className="bg-[#0F172A] px-4 py-12 text-white sm:px-6 lg:px-8 lg:py-16">
+      <section className="bg-[#0F172A] px-4 pt-16 pb-12 text-white sm:px-6 sm:pt-20 sm:pb-16 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
             <Link href="/" className="hover:text-sky-400">

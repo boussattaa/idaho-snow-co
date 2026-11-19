@@ -4,7 +4,7 @@ export const SITE_CONFIG = {
   domain: "https://idahosnowco.com",
   phoneDisplay: "(208) 965-4285",
   phoneHref: "tel:2089654285",
-  email: "Boussattaa@gmail.com",
+  email: "quotes@idahosnowco.com",
   corridorHeadline: "Highway 55 & Boise Basin Corridor: Boise Foothills to McCall & New Meadows",
   dispatchBadge: "24/7 Storm Load & Ice Dam Dispatch",
 } as const;

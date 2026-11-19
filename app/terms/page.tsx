@@ -73,7 +73,7 @@ const WAIVER_CLAUSES = [
 export default function TermsAndWaiverPage() {
   return (
     <div className="bg-[#F8FAFC] pb-20">
-      <section className="bg-[#0F172A] px-4 py-14 text-white sm:px-6 lg:px-8">
+      <section className="bg-[#0F172A] px-4 pt-16 pb-14 text-white sm:px-6 sm:pt-20 sm:pb-16 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-sky-300">
             <FileCheck2 className="h-3.5 w-3.5" />
@@ -86,7 +86,14 @@ export default function TermsAndWaiverPage() {
             Applies to all roof snow removal, ice dam mitigation, deck/walkway
             clearing, and cabin storm monitoring dispatches performed by{" "}
             <strong className="text-white">{SITE_CONFIG.businessName}</strong>{" "}
-            ({SITE_CONFIG.domain} • {SITE_CONFIG.phoneDisplay}).
+            ({SITE_CONFIG.domain} &bull; {SITE_CONFIG.phoneDisplay} &bull;{" "}
+            <a
+              href={`mailto:${SITE_CONFIG.email}`}
+              className="text-sky-300 underline decoration-sky-400/50 underline-offset-2 hover:text-sky-200"
+            >
+              {SITE_CONFIG.email}
+            </a>
+            ).
           </p>
         </div>
       </section>

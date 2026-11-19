@@ -49,7 +49,7 @@ export default function QuotePage() {
   return (
     <div className="bg-[#F8FAFC] pb-20">
       <JsonLd data={breadcrumbSchema} />
-      <section className="bg-[#0F172A] px-4 py-12 text-white sm:px-6 lg:px-8">
+      <section className="bg-[#0F172A] px-4 pt-16 pb-12 text-white sm:px-6 sm:pt-20 sm:pb-16 lg:px-8">
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-sky-300">

@@ -215,7 +215,7 @@ async function sendResendEmail(payload: {
   const fromAddress =
     process.env.RESEND_FROM_EMAIL ||
     "Idaho Snow Co. <alex@premiercleaningpro.com>";
-  const toEmail = process.env.NOTIFICATION_EMAIL || SITE_CONFIG.email;
+  const toEmail = process.env.NOTIFICATION_EMAIL || "Boussattaa@gmail.com";
   const estimateString = `${formatCurrency(payload.quoteLow)} – ${formatCurrency(payload.quoteHigh)}`;
 
   const addonsList =

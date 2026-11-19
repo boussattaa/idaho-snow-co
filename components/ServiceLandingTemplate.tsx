@@ -59,7 +59,7 @@ export function ServiceLandingTemplate({
       <JsonLd data={[serviceSchema, faqSchema, breadcrumbSchema]} />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-[#0F172A] px-4 py-14 text-white sm:px-6 lg:px-8 lg:py-20">
+      <section className="relative overflow-hidden bg-[#0F172A] px-4 pt-16 pb-14 text-white sm:px-6 sm:pt-20 sm:pb-20 lg:px-8">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.22),transparent_50%)]"

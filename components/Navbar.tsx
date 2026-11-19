@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Calculator,
+  ChevronDown,
   Menu,
-  Phone,
   ShieldAlert,
   X,
 } from "lucide-react";
@@ -17,6 +17,32 @@ import { STORM_BANNER_CONFIG } from "@/lib/site-config";
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
+  const servicesMenuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function handlePointerDown(event: MouseEvent) {
+      if (
+        servicesMenuRef.current &&
+        !servicesMenuRef.current.contains(event.target as Node)
+      ) {
+        setServicesOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setServicesOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-[#0F172A]/95 text-[#F8FAFC] backdrop-blur-md">
@@ -28,7 +54,7 @@ export function Navbar() {
               <span>{STORM_BANNER_CONFIG.text}</span>
               <Link
                 href={STORM_BANNER_CONFIG.ctaHref}
-                className="inline-flex items-center rounded-full bg-amber-500 px-2.5 py-0.5 text-[11px] font-extrabold text-slate-950 hover:bg-amber-400 transition-colors"
+                className="inline-flex items-center whitespace-nowrap rounded-full bg-amber-500 px-2.5 py-0.5 text-[11px] font-extrabold text-slate-950 hover:bg-amber-400 transition-colors"
               >
                 {STORM_BANNER_CONFIG.ctaLabel} &rarr;
               </Link>
@@ -45,38 +71,15 @@ export function Navbar() {
         </div>
       ) : null}
 
-      {/* Top Emergency Storm Dispatch Strip */}
-      <div className="border-b border-slate-800 bg-slate-950/90 px-4 py-1.5 text-xs">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-slate-300">
-            <span className="inline-flex h-2 w-2 rounded-full bg-amber-400" />
-            <span className="font-semibold text-amber-400 uppercase tracking-wider">
-              {SITE_CONFIG.dispatchBadge}
-            </span>
-            <span className="hidden sm:inline text-slate-400">
-              • Serving Hwy 55 &amp; Boise Basin (Boise Foothills to McCall)
-            </span>
-          </div>
-          <a
-            href={SITE_CONFIG.phoneHref}
-            onClick={() => trackPhoneClick("navbar_top_strip")}
-            className="inline-flex items-center gap-1.5 font-semibold text-sky-400 hover:text-sky-300 transition-colors"
-          >
-            <Phone className="h-3.5 w-3.5" />
-            <span>Direct Storm Desk: {SITE_CONFIG.phoneDisplay}</span>
-          </a>
-        </div>
-      </div>
-
       {/* Main Nav Bar */}
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2.5 group">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5 group whitespace-nowrap">
           <BrandLogo className="h-10 w-10 shrink-0 rounded-xl shadow-md shadow-sky-500/20 transition-transform group-hover:scale-105" />
           <div>
-            <span className="block text-lg font-extrabold tracking-tight text-white leading-none">
+            <span className="block whitespace-nowrap text-lg font-extrabold tracking-tight text-white leading-none">
               Idaho Snow Co.
             </span>
-            <span className="block text-[11px] font-medium tracking-wider text-sky-400 uppercase mt-0.5">
+            <span className="block whitespace-nowrap text-[11px] font-medium tracking-wider text-sky-400 uppercase mt-0.5">
               Hwy 55 &amp; Alpine Roof Care
             </span>
           </div>
@@ -84,56 +87,95 @@ export function Navbar() {
 
         {/* Desktop Links */}
         <nav className="hidden items-center gap-5 xl:gap-6 lg:flex" aria-label="Main navigation">
-          {SERVICES.map((svc) => (
-            <Link
-              key={svc.slug}
-              href={svc.href}
-              className="text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
+          <div
+            ref={servicesMenuRef}
+            className="relative"
+            onMouseEnter={() => setServicesOpen(true)}
+            onMouseLeave={() => setServicesOpen(false)}
+          >
+            <button
+              type="button"
+              onClick={() => setServicesOpen((prev) => !prev)}
+              aria-expanded={servicesOpen}
+              aria-haspopup="true"
+              className="inline-flex items-center gap-1 whitespace-nowrap py-1.5 text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
             >
-              {svc.shortTitle}
-            </Link>
-          ))}
+              <span>Services</span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform duration-150 ${
+                  servicesOpen ? "rotate-180 text-sky-400" : ""
+                }`}
+              />
+            </button>
+
+            {servicesOpen ? (
+              <div className="absolute left-0 top-full z-50 w-72 pt-2">
+                <div
+                  role="menu"
+                  className="rounded-2xl border border-slate-700/80 bg-slate-950/95 p-2 shadow-2xl shadow-slate-950/70 backdrop-blur-md"
+                >
+                  {SERVICES.map((svc) => (
+                    <Link
+                      key={svc.slug}
+                      href={svc.href}
+                      role="menuitem"
+                      onClick={() => setServicesOpen(false)}
+                      className="block rounded-xl px-3.5 py-2.5 transition-colors hover:bg-slate-800/80"
+                    >
+                      <span className="block whitespace-nowrap text-sm font-semibold text-white">
+                        {svc.shortTitle}
+                      </span>
+                      <span className="mt-0.5 block text-xs leading-snug text-slate-400">
+                        {svc.badge}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+
           <Link
             href="/locations"
-            className="text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
+            className="whitespace-nowrap text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
           >
             Service Areas
           </Link>
           <Link
             href="/snow-load-calculator"
-            className="text-sm font-medium text-sky-300 hover:text-sky-200 transition-colors"
+            className="whitespace-nowrap text-sm font-medium text-sky-300 hover:text-sky-200 transition-colors"
           >
             PSF Weight Tool
           </Link>
           <Link
             href="/guides"
-            className="text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
+            className="whitespace-nowrap text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
           >
             Guides
           </Link>
           <Link
             href="/property-managers"
-            className="text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
+            className="whitespace-nowrap text-sm font-medium text-slate-200 hover:text-sky-400 transition-colors"
           >
             STR &amp; HOAs
           </Link>
         </nav>
 
         {/* Desktop CTAs */}
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden shrink-0 items-center gap-3 md:flex">
           <Link
             href="/quote"
-            className="inline-flex items-center gap-2 rounded-xl border border-sky-400/40 bg-sky-500/15 px-4 py-2 text-sm font-semibold text-sky-300 hover:bg-sky-500/25 transition-colors"
+            className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border border-sky-400/40 bg-sky-500/15 px-4 py-2 text-sm font-semibold text-sky-300 hover:bg-sky-500/25 transition-colors"
           >
-            <Calculator className="h-4 w-4" />
+            <Calculator className="h-4 w-4 shrink-0" />
             <span>Instant Quote</span>
           </Link>
           <a
             href={SITE_CONFIG.phoneHref}
             onClick={() => trackPhoneClick("navbar_cta")}
-            className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/20 hover:bg-amber-400 transition-colors"
+            className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl bg-amber-500 px-4 py-2 text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/20 hover:bg-amber-400 transition-colors"
           >
-            <ShieldAlert className="h-4 w-4" />
+            <ShieldAlert className="h-4 w-4 shrink-0" />
             <span>{SITE_CONFIG.phoneDisplay}</span>
           </a>
         </div>

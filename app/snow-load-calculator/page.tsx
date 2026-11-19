@@ -71,7 +71,7 @@ export default function SnowLoadCalculatorPage() {
     <div className="bg-[#F8FAFC] pb-20">
       <JsonLd data={[webAppSchema, breadcrumbSchema]} />
 
-      <section className="bg-[#0F172A] px-4 py-14 text-white sm:px-6 lg:px-8">
+      <section className="bg-[#0F172A] px-4 pt-16 pb-14 text-white sm:px-6 sm:pt-20 sm:pb-16 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-sky-300">
             <Scale className="h-3.5 w-3.5" />

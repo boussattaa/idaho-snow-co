@@ -74,7 +74,7 @@ export default function PropertyManagersPage() {
       <JsonLd data={[b2bSchema, breadcrumbSchema]} />
 
       {/* B2B Hero */}
-      <section className="bg-[#0F172A] px-4 py-14 text-white sm:px-6 lg:px-8 lg:py-20">
+      <section className="bg-[#0F172A] px-4 pt-16 pb-14 text-white sm:px-6 sm:pt-20 sm:pb-20 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/15 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-300">
             <Building2 className="h-3.5 w-3.5" />
